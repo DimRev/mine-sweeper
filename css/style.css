@@ -19,11 +19,17 @@ td {
 }
 
 button {
+  background-color: #6B6B6B;
   align-self: center;
   height: 2rem;
   width: 2rem;
   color: black;
 }
+button:hover{
+  background-color: #9A9A9A;
+}
+
+
 
 .counters-container {
   display: flex;
@@ -43,22 +49,22 @@ button {
   display: none;
 }
 
-.shown {
+.shown,.shown:disabled {
   background-color: lightgray;
 }
 
-.marked {
+.marked,.marked:disabled {
   background-color: lightslategrey;
 }
 
-.losing-bomb {
+.losing-bomb,.losing-bomb:disabled {
   background-color: red;
 }
 
-.missed {
+.missed,.missed:disabled {
   background-color: lightseagreen;
 }
 
-.win-marked {
+.win-marked,.win-marked:disabled {
   background-color: green;
 }

@@ -1,29 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/reset.css">
-  <link rel="stylesheet" href="css/style.css">
-  <title>Mine Sweeper</title>
-</head>
-<body onload="onInit()">
-  
-  <header>
-    <h1>Mine Sweeper</h1>
-  </header>
-  <div class="counters-container">
-    <div class="mines-left">2</div>
-    <button class="rst-btn" onclick="onInit()">😁</button>
-    <div class="timer">00:00</div>
-  </div>
-  <table oncontextmenu="return false;"></table>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Mine Sweeper</title>
+  </head>
+  <body onload="onInit()">
+    <header>
+      <h1>Mine Sweeper</h1>
+    </header>
+    <div class="counters-container">
+      <div class="mines-left"><span>2</span></div>
+      <button class="rst-btn" onclick="onInit()">😁</button>
+      <div class="timer"><span>00:00</span></div>
+    </div>
+    <table oncontextmenu="return false;"></table>
 
-  <script src="js/utils.js"></script>
-  <script src="js/main.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
 
-  <footer>
-    <p>Made by - Dima Revelson</p>
-  </footer>
-</body>
+    <footer>
+      <p>Made by - Dima Revelson</p>
+    </footer>
+  </body>
 </html>

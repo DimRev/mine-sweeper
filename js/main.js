@@ -1,3 +1,5 @@
+'use strict'
+
 //* gBoard – A Matrix containing cell objects
 
 /*
@@ -38,6 +40,9 @@ function onInit() {
   gGame.isOn = true
   gGame.shownCount = 0
   gGame.markedCount = 0
+
+  const elMinesCounter = document.querySelector('.mines-left span')
+  elMinesCounter.innerText = gLevel.MINES
 
   renderBoard(gBoard)
 }
@@ -117,7 +122,7 @@ function generateTdHTMLString(board, i, j) {
       onCellClicked(this,${i},${j})
       " oncontextmenu="onCellMarked(this,${i},${j})"
       >
-      <div class="hidden">
+      <div class="inner-cell hidden">
       💣
       </div></button></td>\n`
   } else {
@@ -125,7 +130,7 @@ function generateTdHTMLString(board, i, j) {
       <button class="cell" onclick="
       onCellClicked(this,${i},${j})
       " oncontextmenu="onCellMarked(this, ${i},${j})">
-      <div class="hidden">
+      <div class="inner-cell hidden">
       ${board[i][j].minesAroundCount}
       </div></button></td>\n`
   }
@@ -154,7 +159,7 @@ function setMinesNegsCount(board) {
 
 /* Called when a cell is clicked */
 function onCellClicked(elCell, i, j) {
-  if (gBoard[i][j].isMarked) return
+  if (gBoard[i][j].isMarked || !gGame.isOn) return
 
   if (gBoard[i][j].isMine) {
     loseState(elCell)
@@ -164,7 +169,7 @@ function onCellClicked(elCell, i, j) {
   gBoard[i][j].isShown = true
   gGame.shownCount++
 
-  const elCellText = elCell.querySelector('div')
+  const elCellText = elCell.querySelector('.inner-cell')
   elCellText.classList.remove('hidden')
   elCell.classList.add('shown')
   elCell.disabled = 'true'
@@ -176,27 +181,34 @@ function onCellClicked(elCell, i, j) {
 See how you can hide the context 
 menu on right click */
 function onCellMarked(elCell, i, j) {
-  if (gBoard[i][j].isShown) return
+  if (gBoard[i][j].isShown || !gGame.isOn) return
 
-  elCellContainer = elCell.querySelector('div')
-
+  const elCellContainer = elCell.querySelector('.inner-cell')
+  const elMinesCounter = document.querySelector('.mines-left span')
   if (gBoard[i][j].isMarked) {
     gBoard[i][j].isMarked = false
     gGame.markedCount--
-
+    var currMinesCount = gLevel.MINES - +gGame.markedCount
+    currMinesCount = (currMinesCount > 0) ? currMinesCount : 0
+    
+    elMinesCounter.innerText = currMinesCount
     elCell.classList.remove('marked')
     elCellContainer.classList.add('hidden')
     elCellContainer.innerText = gBoard[i][j].isMine
-      ? '💣'
-      : `${gBoard[i][j].minesAroundCount}`
-
+    ? '💣'
+    : `${gBoard[i][j].minesAroundCount}`
+    
     checkGameOver()
     return
   }
-
+  
   gBoard[i][j].isMarked = true
   gGame.markedCount++
+  var currMinesCount = gLevel.MINES - +gGame.markedCount
+  currMinesCount = (currMinesCount > 0) ? currMinesCount : 0
+  
 
+  elMinesCounter.innerText = currMinesCount
   elCell.classList.add('marked')
   elCellContainer.classList.remove('hidden')
   elCellContainer.innerText = '🚩'
@@ -206,6 +218,8 @@ function onCellMarked(elCell, i, j) {
 }
 
 function loseState(elCell) {
+  gGame.isOn = false
+
   elCell.classList.add('losing-bomb')
   const elHiddenCells = document.querySelectorAll('.hidden')
   elHiddenCells.forEach((elHiddenCell) => {
@@ -217,9 +231,11 @@ function loseState(elCell) {
   })
 }
 
-function victoryState(){
-  const elMarkedCells  = document.querySelectorAll('.shown')
-  elMarkedCells .forEach((elMarkedCell) => {
+function victoryState() {
+  gGame.isOn = false
+
+  const elMarkedCells = document.querySelectorAll('.shown')
+  elMarkedCells.forEach((elMarkedCell) => {
     elMarkedCell.classList.add('win-marked')
     elMarkedCell.classList.remove('shown')
   })
@@ -253,4 +269,6 @@ later, try to work more like the
 real algorithm (see description 
 at the Bonuses section below)
  */
-function expandShown(board, elCell, i, j) {}
+function expandShown(board, elCell, i, j) {
+  
+}
