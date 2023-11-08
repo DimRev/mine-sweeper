@@ -47,9 +47,9 @@ button:hover{
   text-align: center;
 }
 
-.rst-btn {
+.rst-btn,.hint-btn {
   height: 4.5rem;
-  width: 4.5rem;
+  width: 7rem;
 }
 
 .hidden {
@@ -74,4 +74,8 @@ button:hover{
 
 .win-marked,.win-marked:disabled {
   background-color: green;
+}
+
+.selected {
+  background-color: orange;
 }

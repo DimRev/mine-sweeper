@@ -18,9 +18,11 @@
 /*
 //* gGame = {
  isOn: true,
- isFirstClick : true
+ isFirstClick : true,
+ isHint : false,
  shownCount: 0,
  markedCount: 0,
+ hintCount: 3,
  secsPassed: 0
  lives: 3
 } */
@@ -41,8 +43,10 @@ function onInit() {
   gGame = {}
   gGame.isFirstClick = true
   gGame.isOn = true
+  gGame.isHint = false
   gGame.shownCount = 0
   gGame.markedCount = 0
+  gGame.hintCount = 3
   gGame.lives = gLevel.LIVES
 
   gBoard = buildBoard(gLevel.SIZE)
@@ -128,32 +132,20 @@ function generateTdHTMLString(board, i, j) {
   var HTMLstr = ''
 
   HTMLstr += `<td>
-      <button class="cell ${board[i][j].isShown ? 'shown' : ''}" onclick="
-      onCellClicked(this,${i},${j})
-      " oncontextmenu="onCellMarked(this,${i},${j})"
+      <button class="
+      cell-btn 
+      cell-btn-${i}-${j} 
+      ${board[i][j].isShown ? 'shown' : ''}
+      " 
+      onclick="onCellClicked(this,${i},${j})" 
+      oncontextmenu="onCellMarked(this,${i},${j})"
       >
-      <div class="inner-cell ${board[i][j].isShown ? '' : 'hidden'}">
+      <div class="
+      inner-cell 
+      inner-cell-${i}-${j} 
+      ${board[i][j].isShown ? '' : 'hidden'}">
       ${board[i][j].isMine ? '💣' : `${board[i][j].minesAroundCount}`}
       </div></button></td>\n`
-
-  // if (board[i][j].isMine) {
-  //   HTMLstr += `<td>
-  //     <button class="cell" onclick="
-  //     onCellClicked(this,${i},${j})
-  //     " oncontextmenu="onCellMarked(this,${i},${j})"
-  //     >
-  //     <div class="inner-cell ${board[i][j].isShown ? '' : 'hidden'}">
-  //     💣
-  //     </div></button></td>\n`
-  // } else {
-  //   HTMLstr += `<td>
-  //     <button class="cell" onclick="
-  //     onCellClicked(this,${i},${j})
-  //     " oncontextmenu="onCellMarked(this, ${i},${j})">
-  //     <div class="inner-cell hidden">
-  //     ${board[i][j].minesAroundCount}
-  //     </div></button></td>\n`
-  // }
   return HTMLstr
 }
 
@@ -179,6 +171,10 @@ function setMinesNegsCount(board) {
 
 /* Called when a cell is clicked */
 function onCellClicked(elCell, i, j) {
+  if (gGame.isHint) {
+    selectCellHint(elCell, i, j)
+    return
+  }
   if (gBoard[i][j].isMarked || !gGame.isOn) return
   if (gGame.isFirstClick && gBoard[i][j].isMine) {
     handleFirstClick(elCell, i, j)
@@ -195,6 +191,7 @@ function onCellClicked(elCell, i, j) {
 
   const elCellText = elCell.querySelector('.inner-cell')
   elCellText.classList.remove('hidden')
+  elCellText.innerText = gBoard[i][j].minesAroundCount
   elCell.classList.add('shown')
   elCell.disabled = 'true'
 
@@ -209,8 +206,9 @@ function onCellMarked(elCell, i, j) {
 
   const elCellContainer = elCell.querySelector('.inner-cell')
   const elMinesCounter = document.querySelector('.mines-left span')
-  if (gBoard[i][j].isMarked) {
-    gBoard[i][j].isMarked = false
+  const currCell = gBoard[i][j]
+  if (currCell.isMarked) {
+    currCell.isMarked = false
     gGame.markedCount--
     var currMinesCount = gLevel.MINES - +gGame.markedCount
     currMinesCount = currMinesCount > 0 ? currMinesCount : 0
@@ -218,9 +216,9 @@ function onCellMarked(elCell, i, j) {
     elMinesCounter.innerText = currMinesCount
     elCell.classList.remove('marked')
     elCellContainer.classList.add('hidden')
-    elCellContainer.innerText = gBoard[i][j].isMine
+    elCellContainer.innerText = currCell.isMine
       ? '💣'
-      : `${gBoard[i][j].minesAroundCount}`
+      : `${currCell.minesAroundCount}`
 
     checkGameOver()
     return
@@ -256,7 +254,7 @@ function loseState(elCell, i, j) {
   elHiddenCells.forEach((elHiddenCell) => {
     elHiddenCell.classList.remove('hidden')
   })
-  const elCellBtns = document.querySelectorAll('.cell')
+  const elCellBtns = document.querySelectorAll('.cell-btn')
   elCellBtns.forEach((elCellBtn) => {
     elCellBtn.disabled = 'true'
   })
@@ -272,7 +270,7 @@ function victoryState() {
     elMarkedCell.classList.add('win-marked')
     elMarkedCell.classList.remove('shown')
   })
-  const elCellBtns = document.querySelectorAll('.cell')
+  const elCellBtns = document.querySelectorAll('.cell-btn')
   elCellBtns.forEach((elCellBtn) => {
     elCellBtn.disabled = 'true'
   })
@@ -318,4 +316,56 @@ function handleFirstClick(elCell, i, j) {
   generateMines(gBoard, 1)
   setMinesNegsCount(gBoard)
   renderBoard(gBoard)
+}
+
+function onHintActivate() {
+  if (gGame.hintCount > 0) {
+    const elHintBtn = document.querySelector('.hint-btn')
+    elHintBtn.classList.toggle('selected')
+    gGame.isHint = !gGame.isHint
+  }
+}
+
+function selectCellHint(elCell, idxI, idxJ) {
+  gGame.hintCount--
+  for (let i = idxI - 1; i <= idxI + 1; i++) {
+    if (i < 0 || i > gBoard.length) continue
+
+    for (let j = idxJ - 1; j <= idxJ + 1; j++) {
+      if (j < 0 || j > gBoard[i].length) continue
+      const elCurrInnerCell = document.querySelector(`.inner-cell-${i}-${j}`)
+      const elCurrCellbtn = document.querySelector(`.cell-btn-${i}-${j}`)
+      if (elCurrInnerCell.classList.contains('hidden')) {
+        elCurrInnerCell.classList.remove('hidden')
+        elCurrCellbtn.classList.add('selected')
+        setTimeout(() => {
+          elCurrInnerCell.classList.add('hidden')
+          elCurrCellbtn.classList.remove('selected')
+        }, 1500)
+      }
+      if (elCurrCellbtn.classList.contains('marked')) {
+        console.log('test')
+        elCurrCellbtn.classList.remove('marked')
+        elCurrCellbtn.classList.add('selected')
+        elCurrInnerCell.innerText = gBoard[i][j].isMine
+          ? '💣'
+          : gBoard[i][j].minesAroundCount
+
+        setTimeout(() => {
+          elCurrCellbtn.classList.add('marked')
+          elCurrCellbtn.classList.remove('selected')
+          elCurrInnerCell.innerText = '🚩'
+        }, 1500)
+      }
+    }
+  }
+  gGame.isHint = false
+  const elHintBtn = document.querySelector('.hint-btn')
+  elHintBtn.classList.remove('selected')
+  elHintBtn.innerText = ''
+  var lights = ''
+  for (let i = 0; i < gGame.hintCount; i++) {
+    lights += '💡'
+  }
+  elHintBtn.innerText += lights
 }
