@@ -52,6 +52,20 @@ button:hover{
   width: 7rem;
 }
 
+.mid-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20vw;
+}
+
+.leaderboard tr,
+.leaderboard td,
+.leaderboard table{
+  width: 14rem;
+  height: 1rem;
+}
+
 .hidden {
   display: none;
 }

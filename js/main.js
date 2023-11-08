@@ -27,14 +27,21 @@
  lives: 3
 } */
 
+/*//*g Leaderboard = [{
+  name : Dima
+  time : 05:00
+}],...] */
 //*--------------Global Variables---------------------*//
 var gBoard
 var gLevel
 var gGame
+var gLeaderboard
+var gTimer
 
 /* This is called when page loads  */
 function onInit() {
   gBoard = []
+  gLeaderboard = []
   gLevel = {
     SIZE: 4,
     MINES: 2,
@@ -50,25 +57,28 @@ function onInit() {
   gGame.hintCount = gLevel.HINTS
   gGame.livesCount = gLevel.LIVES
 
-  
-
   gBoard = buildBoard(gLevel.SIZE)
+
+  clearInterval(gTimer)
+  gTimer = 0
 
   const elLivesCounter = document.querySelector('.lives-left span')
   const elMinesCounter = document.querySelector('.mines-left span')
   const elRstBtn = document.querySelector('.rst-btn')
+  const elTimer = document.querySelector('.timer span')
 
-  
+  elTimer.innerText = '00:00'
   elRstBtn.innerText = '😁'
   var livesStr = ''
-  for(let i = 0; i < gLevel.LIVES ; i++){
-    livesStr+= '❤'
+  for (let i = 0; i < gLevel.LIVES; i++) {
+    livesStr += '❤'
   }
   elLivesCounter.innerText = livesStr
   elMinesCounter.innerText = gLevel.MINES
 
-
   renderBoard(gBoard)
+  renderLeaderboard()
+  // resetLeaderboard()
 }
 
 /* Builds the board 
@@ -183,6 +193,7 @@ function setMinesNegsCount(board) {
 
 /* Called when a cell is clicked */
 function onCellClicked(elCell, i, j) {
+  if (gGame.isFirstClick) startTimer()
   if (gGame.isHint) {
     selectCellHint(elCell, i, j)
     return
@@ -254,11 +265,12 @@ function loseState(elCell, i, j) {
   const elLivesCounter = document.querySelector('.lives-left span')
   gGame.livesCount--
   var livesStr = ''
-  for(let i = 0; i < gGame.livesCount ; i++){
-    livesStr+= '❤'
+  for (let i = 0; i < gGame.livesCount; i++) {
+    livesStr += '❤'
   }
   elLivesCounter.innerText = livesStr
   if (gGame.livesCount > 0) {
+    stopTimer()
     onCellMarked(elCell, i, j)
     return
   }
@@ -280,6 +292,7 @@ function loseState(elCell, i, j) {
 
 function victoryState() {
   gGame.isOn = false
+  const elTimer = document.querySelector('.timer span')
 
   const elMarkedCells = document.querySelectorAll('.shown')
   elMarkedCells.forEach((elMarkedCell) => {
@@ -292,6 +305,12 @@ function victoryState() {
   })
   const elRstBtn = document.querySelector('.rst-btn')
   elRstBtn.innerText = '😎'
+
+  const player = {
+    name: prompt('Type your name:'),
+    time: elTimer.innerText,
+  }
+  updateLeaderboard(player)
 }
 
 /* Game ends when all mines are 
@@ -302,7 +321,10 @@ function checkGameOver() {
   const BOARD_SHOWN_SIZE = BOARD_SIZE - gLevel.MINES
 
   console.log(BOARD_SHOWN_SIZE, gGame.shownCount, gGame.markedCount)
-  if (gGame.shownCount === BOARD_SHOWN_SIZE) victoryState()
+  if (gGame.shownCount === BOARD_SHOWN_SIZE) {
+    victoryState()
+    stopTimer()
+  }
 }
 
 /* When user clicks a cell with no 
@@ -384,4 +406,116 @@ function selectCellHint(elCell, idxI, idxJ) {
     lights += '💡'
   }
   elHintBtn.innerText += lights
+}
+
+function renderLeaderboard() {
+  gLeaderboard = []
+  for (let i = 1; i <= 10; i++) {
+    var playerStr = leaderboardRetrieve(i)
+    var playerObj = leaderboardStrObjectFactory(playerStr)
+    gLeaderboard.push(playerObj)
+  }
+  var leaderboardHTMLStr = '<table class="leaderboard">'
+  for (let i = 0; i < gLeaderboard.length; i++) {
+    leaderboardHTMLStr += `<tr>
+    <td>${i + 1}</td>
+    <td>${gLeaderboard[i].name}</td>
+    <td>${gLeaderboard[i].time}</td>
+    </tr>\n`
+  }
+  leaderboardHTMLStr += '</table>'
+  const elLeaderboard = document.querySelector('.leaderboard')
+  elLeaderboard.innerHTML = leaderboardHTMLStr
+}
+
+//playerStr = 'Dima-05:00'
+
+function updateLeaderboard(player) {
+  const playerMinutes = +player.time.split(':')[0]
+  const playerSeconds = +player.time.split(':')[1]
+
+  for (let i = 0; i < 10; i++) {
+    var currMinutes = +gLeaderboard[i].time.split(':')[0]
+    var currSeconds = +gLeaderboard[i].time.split(':')[1]
+    if (playerMinutes >= currMinutes) continue
+    if (playerSeconds > currSeconds && playerMinutes >= currMinutes) continue
+    gLeaderboard.splice(i, 0, player)
+    gLeaderboard.slice(0, 10)
+    for (let j = 0; j < 10; j++) {
+      leaderboardStore(gLeaderboard[j], j + 1)
+    }
+    break
+  }
+  renderLeaderboard()
+}
+
+function leaderboardStrObjectFactory(playerStr) {
+  const playerArr = playerStr.split('-')
+  const player = {
+    name: playerArr[0],
+    time: playerArr[1],
+  }
+  return player
+}
+
+function leaderboardStore(playerObj, position) {
+  position = 'n' + position
+  const playerStr = Object.values(playerObj).join('-')
+  localStorage.setItem(position, playerStr)
+}
+
+function leaderboardRetrieve(position) {
+  position = 'n' + position
+  return localStorage.getItem(position)
+}
+
+function resetLeaderboard() {
+  var player1 = { name: 'player1', time: '10:00' }
+  var player2 = { name: 'player2', time: '15:00' }
+  var player3 = { name: 'player3', time: '20:00' }
+  var player4 = { name: 'player4', time: '25:00' }
+  var player5 = { name: 'player5', time: '30:00' }
+  var player6 = { name: 'player6', time: '35:00' }
+  var player7 = { name: 'player7', time: '40:00' }
+  var player8 = { name: 'player8', time: '45:00' }
+  var player9 = { name: 'player9', time: '50:00' }
+  var player10 = { name: 'player10', time: '55:00' }
+  leaderboardStore(player1, 1)
+  leaderboardStore(player2, 2)
+  leaderboardStore(player3, 3)
+  leaderboardStore(player4, 4)
+  leaderboardStore(player5, 5)
+  leaderboardStore(player6, 6)
+  leaderboardStore(player7, 7)
+  leaderboardStore(player8, 8)
+  leaderboardStore(player9, 9)
+  leaderboardStore(player10, 10)
+  renderLeaderboard()
+}
+
+function startTimer() {
+  var miliseconds = 0
+  var seconds = 0
+  var minutes = 0
+  gTimer = setInterval(() => {
+    miliseconds += 500
+    if (miliseconds >= 1000) {
+      miliseconds -= 1000
+      seconds++
+    }
+    if (seconds >= 60) {
+      seconds -= 60
+      minutes++
+    }
+    const minutesStr = minutes < 10 ? '0' + minutes : minutes
+    const secondsStr = seconds < 10 ? '0' + seconds : seconds
+    const timerStr = `${minutesStr}:${secondsStr}`
+    const elTimer = document.querySelector('.timer span')
+    elTimer.innerText = timerStr
+  }, 500)
+}
+
+function stopTimer(){
+  clearInterval(gTimer)
+  gTimer = 0
 }
