@@ -39,6 +39,7 @@ function onInit() {
     SIZE: 4,
     MINES: 2,
     LIVES: 3,
+    HINTS: 3,
   }
   gGame = {}
   gGame.isFirstClick = true
@@ -46,15 +47,26 @@ function onInit() {
   gGame.isHint = false
   gGame.shownCount = 0
   gGame.markedCount = 0
-  gGame.hintCount = 3
-  gGame.lives = gLevel.LIVES
+  gGame.hintCount = gLevel.HINTS
+  gGame.livesCount = gLevel.LIVES
+
+  
 
   gBoard = buildBoard(gLevel.SIZE)
 
   const elLivesCounter = document.querySelector('.lives-left span')
   const elMinesCounter = document.querySelector('.mines-left span')
-  elLivesCounter.innerText = gLevel.LIVES
+  const elRstBtn = document.querySelector('.rst-btn')
+
+  
+  elRstBtn.innerText = '😁'
+  var livesStr = ''
+  for(let i = 0; i < gLevel.LIVES ; i++){
+    livesStr+= '❤'
+  }
+  elLivesCounter.innerText = livesStr
   elMinesCounter.innerText = gLevel.MINES
+
 
   renderBoard(gBoard)
 }
@@ -240,9 +252,13 @@ function onCellMarked(elCell, i, j) {
 
 function loseState(elCell, i, j) {
   const elLivesCounter = document.querySelector('.lives-left span')
-  gGame.lives--
-  elLivesCounter.innerText = gGame.lives
-  if (gGame.lives > 0) {
+  gGame.livesCount--
+  var livesStr = ''
+  for(let i = 0; i < gGame.livesCount ; i++){
+    livesStr+= '❤'
+  }
+  elLivesCounter.innerText = livesStr
+  if (gGame.livesCount > 0) {
     onCellMarked(elCell, i, j)
     return
   }
