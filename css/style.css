@@ -1,0 +1,16 @@
+body{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+table,tr,td{
+  border: 1px solid white;
+  border-collapse: collapse;
+}
+
+td {
+  width: 3rem;
+  height: 3rem;
+  text-align: center;
+}

@@ -51,18 +51,17 @@ function countNeighbors(idxI, idxJ, arr, iRange = 1, jRange = 1, value = '') {
 
 //Returns object {i,j} of random location of value
 function findRandomCellWithValue(arr, value = '') {
-  var emptyCells = []
+  var locatedValue = []
   for (let i = 0; i < arr.length; i++) {
     for (let j = 0; j < arr[i].length; j++) {
       if (arr[i][j] === value) {
-        emptyCells.push({
+        locatedValue.push({
           i,
           j,
         })
       }
     }
   }
-  if (emptyCells.length === 0) return null
-  return emptyCells.splice(getRandomInteger(0, emptyCells.length), 1)[0]
+  if (locatedValue.length === 0) return null
+  return locatedValue.splice(getRandomInteger(0, locatedValue.length), 1)[0]
 }
-
