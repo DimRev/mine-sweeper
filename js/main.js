@@ -28,7 +28,17 @@ var gGame
 
 /* This is called when page loads  */
 function onInit() {
-  gBoard = buildBoard(4, 4)
+  gBoard = []
+  gLevel = {
+    SIZE: 4,
+    MINES: 2,
+  }
+  gGame = {}
+  gBoard = buildBoard(gLevel.SIZE)
+  gGame.isOn = true
+  gGame.shownCount = 0
+  gGame.markedCount = 0
+
   renderBoard(gBoard)
 }
 
@@ -36,7 +46,7 @@ function onInit() {
 Set the mines
 Call setMinesNegsCount()
 Return the created board */
-function buildBoard(rows, cols) {
+function buildBoard(rows, cols = rows) {
   const board = []
   for (var i = 0; i < rows; i++) {
     board[i] = []
@@ -50,16 +60,15 @@ function buildBoard(rows, cols) {
       board[i][j] = cell
     }
   }
-  generateMines(board, 2)
+  generateMines(board, gGame.MINES)
   setMinesNegsCount(board)
-  console.log(board)
   return board
 }
 
 //Generates mines onto the board
-function generateMines(board, num) {
+function generateMines(board, numOfMines) {
   //!Random mines ARE working, but disabled for now
-  //// for(let i = 0; i < num ; i++){
+  //// for(let i = 0; i < numOfMines ; i++){
   ////   const pos = findEmptyCell(board)
   ////   board[pos.i][pos.j].isMine = true
   //// }
@@ -146,15 +155,21 @@ function setMinesNegsCount(board) {
 /* Called when a cell is clicked */
 function onCellClicked(elCell, i, j) {
   if (gBoard[i][j].isMarked) return
+
+  if (gBoard[i][j].isMine) {
+    loseState(elCell)
+    return
+  }
+
+  gBoard[i][j].isShown = true
+  gGame.shownCount++
+
   const elCellText = elCell.querySelector('div')
   elCellText.classList.remove('hidden')
   elCell.classList.add('shown')
   elCell.disabled = 'true'
-  gBoard[i][j].isShown = true
-  if (gBoard[i][j].isMine) {
-    checkGameOver()
-    return
-  }
+
+  checkGameOver()
 }
 
 /* Called when a cell is right clicked
@@ -162,28 +177,68 @@ See how you can hide the context
 menu on right click */
 function onCellMarked(elCell, i, j) {
   if (gBoard[i][j].isShown) return
+
   elCellContainer = elCell.querySelector('div')
 
   if (gBoard[i][j].isMarked) {
     gBoard[i][j].isMarked = false
-    elCellContainer.classList.add('hidden')
+    gGame.markedCount--
+
     elCell.classList.remove('marked')
+    elCellContainer.classList.add('hidden')
     elCellContainer.innerText = gBoard[i][j].isMine
       ? '💣'
       : `${gBoard[i][j].minesAroundCount}`
+
+    checkGameOver()
     return
   }
+
   gBoard[i][j].isMarked = true
-  elCellContainer.classList.remove('hidden')
+  gGame.markedCount++
+
   elCell.classList.add('marked')
+  elCellContainer.classList.remove('hidden')
   elCellContainer.innerText = '🚩'
+
+  checkGameOver()
   return
+}
+
+function loseState(elCell) {
+  elCell.classList.add('losing-bomb')
+  const elHiddenCells = document.querySelectorAll('.hidden')
+  elHiddenCells.forEach((elHiddenCell) => {
+    elHiddenCell.classList.remove('hidden')
+  })
+  const elCellBtns = document.querySelectorAll('.cell')
+  elCellBtns.forEach((elCellBtn) => {
+    elCellBtn.disabled = 'true'
+  })
+}
+
+function victoryState(){
+  const elMarkedCells  = document.querySelectorAll('.shown')
+  elMarkedCells .forEach((elMarkedCell) => {
+    elMarkedCell.classList.add('win-marked')
+    elMarkedCell.classList.remove('shown')
+  })
+  const elCellBtns = document.querySelectorAll('.cell')
+  elCellBtns.forEach((elCellBtn) => {
+    elCellBtn.disabled = 'true'
+  })
 }
 
 /* Game ends when all mines are 
 marked, and all the other cells 
 are shown */
-function checkGameOver() {}
+function checkGameOver() {
+  const BOARD_SIZE = gLevel.SIZE ** 2
+  const BOARD_SHOWN_SIZE = BOARD_SIZE - gLevel.MINES
+
+  console.log(BOARD_SHOWN_SIZE, gGame.shownCount, gGame.markedCount)
+  if (gGame.shownCount === BOARD_SHOWN_SIZE) victoryState()
+}
 
 /* When user clicks a cell with no 
 mines around, we need to open 

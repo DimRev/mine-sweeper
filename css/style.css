@@ -1,10 +1,13 @@
-body{
+body {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-around;
   align-items: center;
 }
 
-table,tr,td{
+table,
+tr,
+td {
   border: 1px solid white;
   border-collapse: collapse;
 }
@@ -22,14 +25,40 @@ button {
   color: black;
 }
 
+.counters-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 33vw;
+  font-size: 2rem;
+}
+
+.rst-btn {
+  height: 3.5rem;
+  width: 3.5rem;
+  transform: translateX(50%);
+}
+
 .hidden {
   display: none;
 }
 
-.shown { 
+.shown {
   background-color: lightgray;
 }
 
 .marked {
   background-color: lightslategrey;
+}
+
+.losing-bomb {
+  background-color: red;
+}
+
+.missed {
+  background-color: lightseagreen;
+}
+
+.win-marked {
+  background-color: green;
 }
