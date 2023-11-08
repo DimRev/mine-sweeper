@@ -32,17 +32,24 @@ button:hover{
 
 
 .counters-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  font-size: 2rem;
+}
+.counters-container div{
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 33vw;
-  font-size: 2rem;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
 }
 
 .rst-btn {
-  height: 3.5rem;
-  width: 3.5rem;
-  transform: translateX(50%);
+  height: 4.5rem;
+  width: 4.5rem;
 }
 
 .hidden {

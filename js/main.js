@@ -17,10 +17,12 @@
 
 /*
 //* gGame = {
- isOn: false,
+ isOn: true,
+ isFirstClick : true
  shownCount: 0,
  markedCount: 0,
  secsPassed: 0
+ lives: 3
 } */
 
 //*--------------Global Variables---------------------*//
@@ -34,16 +36,20 @@ function onInit() {
   gLevel = {
     SIZE: 4,
     MINES: 2,
+    LIVES: 3,
   }
   gGame = {}
   gGame.isFirstClick = true
   gGame.isOn = true
   gGame.shownCount = 0
   gGame.markedCount = 0
+  gGame.lives = gLevel.LIVES
 
   gBoard = buildBoard(gLevel.SIZE)
 
+  const elLivesCounter = document.querySelector('.lives-left span')
   const elMinesCounter = document.querySelector('.mines-left span')
+  elLivesCounter.innerText = gLevel.LIVES
   elMinesCounter.innerText = gLevel.MINES
 
   renderBoard(gBoard)
@@ -180,7 +186,7 @@ function onCellClicked(elCell, i, j) {
   }
   gGame.isFirstClick = false
   if (gBoard[i][j].isMine) {
-    loseState(elCell)
+    loseState(elCell, i, j)
     return
   }
 
@@ -234,7 +240,15 @@ function onCellMarked(elCell, i, j) {
   return
 }
 
-function loseState(elCell) {
+function loseState(elCell, i, j) {
+  const elLivesCounter = document.querySelector('.lives-left span')
+  gGame.lives--
+  elLivesCounter.innerText = gGame.lives
+  if (gGame.lives > 0) {
+    onCellMarked(elCell, i, j)
+    return
+  }
+  elCell.classList.add('losing-bomb')
   gGame.isOn = false
 
   elCell.classList.add('losing-bomb')
@@ -246,6 +260,8 @@ function loseState(elCell) {
   elCellBtns.forEach((elCellBtn) => {
     elCellBtn.disabled = 'true'
   })
+  const elRstBtn = document.querySelector('.rst-btn')
+  elRstBtn.innerText = '😫'
 }
 
 function victoryState() {
@@ -260,6 +276,8 @@ function victoryState() {
   elCellBtns.forEach((elCellBtn) => {
     elCellBtn.disabled = 'true'
   })
+  const elRstBtn = document.querySelector('.rst-btn')
+  elRstBtn.innerText = '😎'
 }
 
 /* Game ends when all mines are 
