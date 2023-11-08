@@ -36,10 +36,12 @@ function onInit() {
     MINES: 2,
   }
   gGame = {}
-  gBoard = buildBoard(gLevel.SIZE)
+  gGame.isFirstClick = true
   gGame.isOn = true
   gGame.shownCount = 0
   gGame.markedCount = 0
+
+  gBoard = buildBoard(gLevel.SIZE)
 
   const elMinesCounter = document.querySelector('.mines-left span')
   elMinesCounter.innerText = gLevel.MINES
@@ -65,7 +67,7 @@ function buildBoard(rows, cols = rows) {
       board[i][j] = cell
     }
   }
-  generateMines(board, gGame.MINES)
+  generateMines(board, gLevel.MINES)
   setMinesNegsCount(board)
   return board
 }
@@ -73,20 +75,22 @@ function buildBoard(rows, cols = rows) {
 //Generates mines onto the board
 function generateMines(board, numOfMines) {
   //!Random mines ARE working, but disabled for now
-  //// for(let i = 0; i < numOfMines ; i++){
-  ////   const pos = findEmptyCell(board)
-  ////   board[pos.i][pos.j].isMine = true
-  //// }
-
-  board[0][0].isMine = true
-  board[2][2].isMine = true
+  if (!gGame.isFirstClick) {
+    for (let i = 0; i < +numOfMines; i++) {
+      const pos = findEmptyCell(board)
+      board[pos.i][pos.j].isMine = true
+    }
+  } else {
+    board[0][0].isMine = true
+    board[2][2].isMine = true
+  }
 }
 
 function findEmptyCell(board) {
   var emptyCells = []
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[i].length; j++) {
-      if (!board[i][j].isMine) {
+      if (!board[i][j].isMine && !board[i][j].isShown) {
         emptyCells.push({
           i,
           j,
@@ -116,24 +120,34 @@ function renderBoard(board) {
 
 function generateTdHTMLString(board, i, j) {
   var HTMLstr = ''
-  if (board[i][j].isMine) {
-    HTMLstr += `<td>
-      <button class="cell" onclick="
+
+  HTMLstr += `<td>
+      <button class="cell ${board[i][j].isShown ? 'shown' : ''}" onclick="
       onCellClicked(this,${i},${j})
       " oncontextmenu="onCellMarked(this,${i},${j})"
       >
-      <div class="inner-cell hidden">
-      💣
+      <div class="inner-cell ${board[i][j].isShown ? '' : 'hidden'}">
+      ${board[i][j].isMine ? '💣' : `${board[i][j].minesAroundCount}`}
       </div></button></td>\n`
-  } else {
-    HTMLstr += `<td>
-      <button class="cell" onclick="
-      onCellClicked(this,${i},${j})
-      " oncontextmenu="onCellMarked(this, ${i},${j})">
-      <div class="inner-cell hidden">
-      ${board[i][j].minesAroundCount}
-      </div></button></td>\n`
-  }
+
+  // if (board[i][j].isMine) {
+  //   HTMLstr += `<td>
+  //     <button class="cell" onclick="
+  //     onCellClicked(this,${i},${j})
+  //     " oncontextmenu="onCellMarked(this,${i},${j})"
+  //     >
+  //     <div class="inner-cell ${board[i][j].isShown ? '' : 'hidden'}">
+  //     💣
+  //     </div></button></td>\n`
+  // } else {
+  //   HTMLstr += `<td>
+  //     <button class="cell" onclick="
+  //     onCellClicked(this,${i},${j})
+  //     " oncontextmenu="onCellMarked(this, ${i},${j})">
+  //     <div class="inner-cell hidden">
+  //     ${board[i][j].minesAroundCount}
+  //     </div></button></td>\n`
+  // }
   return HTMLstr
 }
 
@@ -160,7 +174,11 @@ function setMinesNegsCount(board) {
 /* Called when a cell is clicked */
 function onCellClicked(elCell, i, j) {
   if (gBoard[i][j].isMarked || !gGame.isOn) return
-
+  if (gGame.isFirstClick && gBoard[i][j].isMine) {
+    handleFirstClick(elCell, i, j)
+    // return
+  }
+  gGame.isFirstClick = false
   if (gBoard[i][j].isMine) {
     loseState(elCell)
     return
@@ -189,24 +207,23 @@ function onCellMarked(elCell, i, j) {
     gBoard[i][j].isMarked = false
     gGame.markedCount--
     var currMinesCount = gLevel.MINES - +gGame.markedCount
-    currMinesCount = (currMinesCount > 0) ? currMinesCount : 0
-    
+    currMinesCount = currMinesCount > 0 ? currMinesCount : 0
+
     elMinesCounter.innerText = currMinesCount
     elCell.classList.remove('marked')
     elCellContainer.classList.add('hidden')
     elCellContainer.innerText = gBoard[i][j].isMine
-    ? '💣'
-    : `${gBoard[i][j].minesAroundCount}`
-    
+      ? '💣'
+      : `${gBoard[i][j].minesAroundCount}`
+
     checkGameOver()
     return
   }
-  
+
   gBoard[i][j].isMarked = true
   gGame.markedCount++
   var currMinesCount = gLevel.MINES - +gGame.markedCount
-  currMinesCount = (currMinesCount > 0) ? currMinesCount : 0
-  
+  currMinesCount = currMinesCount > 0 ? currMinesCount : 0
 
   elMinesCounter.innerText = currMinesCount
   elCell.classList.add('marked')
@@ -269,6 +286,18 @@ later, try to work more like the
 real algorithm (see description 
 at the Bonuses section below)
  */
-function expandShown(board, elCell, i, j) {
-  
+function expandShown(board, elCell, i, j) {}
+
+function handleFirstClick(elCell, i, j) {
+  gGame.isFirstClick = false
+  const currCell = gBoard[i][j]
+  currCell.isMine = false
+  currCell.isShown = true
+  elCell.querySelector('.inner-cell').innerHTML = ''
+  elCell.classList.remove('hidden')
+  elCell.classList.add('shown')
+
+  generateMines(gBoard, 1)
+  setMinesNegsCount(gBoard)
+  renderBoard(gBoard)
 }
