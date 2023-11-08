@@ -14,3 +14,13 @@ td {
   height: 3rem;
   text-align: center;
 }
+
+button {
+  align-self: center;
+  height: 2rem;
+  width: 2rem;
+}
+
+.hidden {
+  display: none;
+}

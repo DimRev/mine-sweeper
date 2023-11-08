@@ -50,17 +50,39 @@ function buildBoard(rows, cols) {
       board[i][j] = cell
     }
   }
-  generateMines(board)
+  generateMines(board,2)
   setMinesNegsCount(board)
   console.log(board)
   return board
 }
 
 //Generates mines onto the board
-function generateMines(board) {
-  //TODO : Make the mines rng, and have diff mine counts
+function generateMines(board, num) {
+  
+  //!Random mines ARE working, but disabled for now
+  //// for(let i = 0; i < num ; i++){
+  ////   const pos = findEmptyCell(board)
+  ////   board[pos.i][pos.j].isMine = true
+  //// }
+  
   board[0][0].isMine = true
   board[2][2].isMine = true
+}
+
+function findEmptyCell(board) {
+  var emptyCells = []
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      if (!board[i][j].isMine) {
+        emptyCells.push({
+          i,
+          j,
+        })
+      }
+    }
+  }
+  if (emptyCells.length === 0) return null
+  return emptyCells.splice(getRandomInteger(0, emptyCells.length), 1)[0]
 }
 
 /* Render the board as a <table> 
@@ -71,14 +93,34 @@ function renderBoard(board) {
     HTMLstr += '<tr>\n'
 
     for (let j = 0; j < board.length; j++) {
-      HTMLstr += board[i][j].isMine
-        ? `<td>💣</td>`
-        : `<td>${board[i][j].minesAroundCount}</td>`
+      HTMLstr += generateTdHTMLString(board, i, j)
     }
     HTMLstr += '</tr>\n'
   }
   const elTable = document.querySelector('table')
   elTable.innerHTML = HTMLstr
+}
+
+function generateTdHTMLString(board, i, j) {
+  var HTMLstr = ''
+  if (board[i][j].isMine) {
+    HTMLstr += `<td>
+      <button class="cell" onclick="
+      onCellClicked(this,${i},${j})
+      ">
+      <div class="hidden">
+      💣
+      </div></button></td>\n`
+  } else {
+    HTMLstr += `<td>
+      <button class="cell" onclick="
+      onCellClicked(this,${i},${j})
+      ">
+      <div class="hidden">
+      ${board[i][j].minesAroundCount}
+      </div></button></td>\n`
+  }
+  return HTMLstr
 }
 
 /* Count mines around each cell 
@@ -96,13 +138,20 @@ function setMinesNegsCount(board) {
           if (board[i][j].isMine) minesCount++
         }
       }
-      board[idxI][idxJ].minesAroundCount = (minesCount === 0) ? ' ' : minesCount
+      board[idxI][idxJ].minesAroundCount = minesCount === 0 ? ' ' : minesCount
     }
   }
 }
 
 /* Called when a cell is clicked */
-function onCellClicked(elCell, i, j) {}
+function onCellClicked(elCell, i, j) {
+  const elCellText = elCell.querySelector('div')
+  elCellText.classList.remove('hidden')
+  if (gBoard[i][j].isMine) {
+    checkGameOver()
+    return
+  }
+}
 
 /* Called when a cell is right clicked
 See how you can hide the context 
