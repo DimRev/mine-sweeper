@@ -51,15 +51,16 @@ function buildBoard(rows, cols) {
     }
   }
   generateMines(board)
+  setMinesNegsCount(board)
   console.log(board)
   return board
 }
 
 //Generates mines onto the board
-function generateMines(board){
+function generateMines(board) {
   //TODO : Make the mines rng, and have diff mine counts
-board[0][0].isMine = true
-board[2][2].isMine = true
+  board[0][0].isMine = true
+  board[2][2].isMine = true
 }
 
 /* Render the board as a <table> 
@@ -70,7 +71,9 @@ function renderBoard(board) {
     HTMLstr += '<tr>\n'
 
     for (let j = 0; j < board.length; j++) {
-      HTMLstr += (board[i][j].isMine) ? `<td>💣</td>` : `<td>1</td>` 
+      HTMLstr += board[i][j].isMine
+        ? `<td>💣</td>`
+        : `<td>${board[i][j].minesAroundCount}</td>`
     }
     HTMLstr += '</tr>\n'
   }
@@ -81,7 +84,22 @@ function renderBoard(board) {
 /* Count mines around each cell 
 and set the cell's 
 minesAroundCount. */
-function setMinesNegsCount(board) {}
+function setMinesNegsCount(board) {
+  for (let idxI = 0; idxI < board.length; idxI++) {
+    for (let idxJ = 0; idxJ < board.length; idxJ++) {
+      var minesCount = 0
+      for (let i = idxI - 1; i <= idxI + 1; i++) {
+        if (i < 0 || i >= board.length) continue
+        for (let j = idxJ - 1; j <= idxJ + 1; j++) {
+          if (j < 0 || j >= board[i].length) continue
+          if (i === idxI && j === idxJ) continue
+          if (board[i][j].isMine) minesCount++
+        }
+      }
+      board[idxI][idxJ].minesAroundCount = (minesCount === 0) ? ' ' : minesCount
+    }
+  }
+}
 
 /* Called when a cell is clicked */
 function onCellClicked(elCell, i, j) {}
