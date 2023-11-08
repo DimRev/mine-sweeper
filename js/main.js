@@ -38,13 +38,12 @@ var gGame
 var gLeaderboard
 var gTimer
 
-
 /* This is called when page loads  */
 function onInit() {
   gBoard = []
   gLeaderboard = []
   gLevel = {
-    SIZE: 4,
+    SIZE: 6,
     MINES: 2,
     LIVES: 3,
     HINTS: 3,
@@ -146,7 +145,7 @@ function renderBoard(board) {
     }
     HTMLstr += '</tr>\n'
   }
-  const elTable = document.querySelector('table')
+  const elTable = document.querySelector('.gameboard')
   elTable.innerHTML = HTMLstr
 }
 
@@ -193,17 +192,24 @@ function setMinesNegsCount(board) {
 
 /* Called when a cell is clicked */
 function onCellClicked(elCell, i, j) {
-  if (gGame.isFirstClick) startTimer()
+  if (gGame.isFirstClick) {
+    if (!gGame.isHint) startTimer()
+  }
+
   if (gGame.isHint) {
     selectCellHint(elCell, i, j)
     return
   }
+
   if (gBoard[i][j].isMarked || !gGame.isOn) return
+
   if (gGame.isFirstClick && gBoard[i][j].isMine) {
     handleFirstClick(elCell, i, j)
     // return
   }
+
   gGame.isFirstClick = false
+
   if (gBoard[i][j].isMine) {
     loseState(elCell, i, j)
     return
@@ -270,10 +276,10 @@ function loseState(elCell, i, j) {
   }
   elLivesCounter.innerText = livesStr
   if (gGame.livesCount > 0) {
-    stopTimer()
     onCellMarked(elCell, i, j)
     return
   }
+  stopTimer()
   elCell.classList.add('losing-bomb')
   gGame.isOn = false
 
@@ -373,6 +379,10 @@ function selectCellHint(elCell, idxI, idxJ) {
       if (j < 0 || j > gBoard[i].length) continue
       const elCurrInnerCell = document.querySelector(`.inner-cell-${i}-${j}`)
       const elCurrCellbtn = document.querySelector(`.cell-btn-${i}-${j}`)
+      clearTimeout(highlightTimer1)
+      clearTimeout(highlightTimer2)
+      var highlightTimer1 = 0
+      var highlightTimer2 = 0
       if (elCurrInnerCell.classList.contains('hidden')) {
         elCurrInnerCell.classList.remove('hidden')
         elCurrCellbtn.classList.add('selected')
@@ -515,7 +525,7 @@ function startTimer() {
   }, 500)
 }
 
-function stopTimer(){
+function stopTimer() {
   clearInterval(gTimer)
   gTimer = 0
 }
