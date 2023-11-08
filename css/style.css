@@ -93,3 +93,15 @@ button:hover{
 .selected {
   background-color: orange;
 }
+
+footer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  gap: 2vh;
+}
+.rst-leaderboard-btn {
+  width: 8rem;
+}

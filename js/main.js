@@ -38,6 +38,7 @@ var gGame
 var gLeaderboard
 var gTimer
 
+
 /* This is called when page loads  */
 function onInit() {
   gBoard = []
@@ -78,7 +79,6 @@ function onInit() {
 
   renderBoard(gBoard)
   renderLeaderboard()
-  // resetLeaderboard()
 }
 
 /* Builds the board 
