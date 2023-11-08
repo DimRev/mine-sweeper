@@ -50,7 +50,7 @@ function buildBoard(rows, cols) {
       board[i][j] = cell
     }
   }
-  generateMines(board,2)
+  generateMines(board, 2)
   setMinesNegsCount(board)
   console.log(board)
   return board
@@ -58,13 +58,12 @@ function buildBoard(rows, cols) {
 
 //Generates mines onto the board
 function generateMines(board, num) {
-  
   //!Random mines ARE working, but disabled for now
   //// for(let i = 0; i < num ; i++){
   ////   const pos = findEmptyCell(board)
   ////   board[pos.i][pos.j].isMine = true
   //// }
-  
+
   board[0][0].isMine = true
   board[2][2].isMine = true
 }
@@ -107,7 +106,8 @@ function generateTdHTMLString(board, i, j) {
     HTMLstr += `<td>
       <button class="cell" onclick="
       onCellClicked(this,${i},${j})
-      ">
+      " oncontextmenu="onCellMarked(this,${i},${j})"
+      >
       <div class="hidden">
       💣
       </div></button></td>\n`
@@ -115,7 +115,7 @@ function generateTdHTMLString(board, i, j) {
     HTMLstr += `<td>
       <button class="cell" onclick="
       onCellClicked(this,${i},${j})
-      ">
+      " oncontextmenu="onCellMarked(this, ${i},${j})">
       <div class="hidden">
       ${board[i][j].minesAroundCount}
       </div></button></td>\n`
@@ -145,8 +145,12 @@ function setMinesNegsCount(board) {
 
 /* Called when a cell is clicked */
 function onCellClicked(elCell, i, j) {
+  if (gBoard[i][j].isMarked) return
   const elCellText = elCell.querySelector('div')
   elCellText.classList.remove('hidden')
+  elCell.classList.add('shown')
+  elCell.disabled = 'true'
+  gBoard[i][j].isShown = true
   if (gBoard[i][j].isMine) {
     checkGameOver()
     return
@@ -156,7 +160,25 @@ function onCellClicked(elCell, i, j) {
 /* Called when a cell is right clicked
 See how you can hide the context 
 menu on right click */
-function onCellMarked(elCell) {}
+function onCellMarked(elCell, i, j) {
+  if (gBoard[i][j].isShown) return
+  elCellContainer = elCell.querySelector('div')
+
+  if (gBoard[i][j].isMarked) {
+    gBoard[i][j].isMarked = false
+    elCellContainer.classList.add('hidden')
+    elCell.classList.remove('marked')
+    elCellContainer.innerText = gBoard[i][j].isMine
+      ? '💣'
+      : `${gBoard[i][j].minesAroundCount}`
+    return
+  }
+  gBoard[i][j].isMarked = true
+  elCellContainer.classList.remove('hidden')
+  elCell.classList.add('marked')
+  elCellContainer.innerText = '🚩'
+  return
+}
 
 /* Game ends when all mines are 
 marked, and all the other cells 

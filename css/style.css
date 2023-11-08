@@ -19,8 +19,17 @@ button {
   align-self: center;
   height: 2rem;
   width: 2rem;
+  color: black;
 }
 
 .hidden {
   display: none;
+}
+
+.shown { 
+  background-color: lightgray;
+}
+
+.marked {
+  background-color: lightslategrey;
 }
