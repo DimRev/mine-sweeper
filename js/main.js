@@ -44,7 +44,7 @@ function onInit() {
   gLeaderboard = []
   gLevel = {
     SIZE: 6,
-    MINES: 2,
+    MINES: 5,
     LIVES: 3,
     HINTS: 3,
   }
@@ -64,6 +64,7 @@ function onInit() {
 
   const elLivesCounter = document.querySelector('.lives-left span')
   const elMinesCounter = document.querySelector('.mines-left span')
+  const elHintsbtn = document.querySelector('.hint-btn')
   const elRstBtn = document.querySelector('.rst-btn')
   const elTimer = document.querySelector('.timer span')
 
@@ -73,6 +74,12 @@ function onInit() {
   for (let i = 0; i < gLevel.LIVES; i++) {
     livesStr += '❤'
   }
+  var hintsStr = ''
+  for (let i = 0; i < gLevel.HINTS; i++) {
+    hintsStr += '💡'
+  }
+
+  elHintsbtn.innerText = hintsStr
   elLivesCounter.innerText = livesStr
   elMinesCounter.innerText = gLevel.MINES
 
@@ -106,15 +113,15 @@ function buildBoard(rows, cols = rows) {
 //Generates mines onto the board
 function generateMines(board, numOfMines) {
   //!Random mines ARE working, but disabled for now
-  if (!gGame.isFirstClick) {
+  // if (!gGame.isFirstClick) {
     for (let i = 0; i < +numOfMines; i++) {
       const pos = findEmptyCell(board)
       board[pos.i][pos.j].isMine = true
     }
-  } else {
-    board[0][0].isMine = true
-    board[2][2].isMine = true
-  }
+  // } else {
+    // board[0][0].isMine = true
+    // board[2][2].isMine = true
+  // }
 }
 
 function findEmptyCell(board) {
@@ -188,43 +195,6 @@ function setMinesNegsCount(board) {
       board[idxI][idxJ].minesAroundCount = minesCount === 0 ? ' ' : minesCount
     }
   }
-}
-
-/* Called when a cell is clicked */
-function onCellClicked(elCell, i, j) {
-  if (gGame.isFirstClick) {
-    if (!gGame.isHint) startTimer()
-  }
-
-  if (gGame.isHint) {
-    selectCellHint(elCell, i, j)
-    return
-  }
-
-  if (gBoard[i][j].isMarked || !gGame.isOn) return
-
-  if (gGame.isFirstClick && gBoard[i][j].isMine) {
-    handleFirstClick(elCell, i, j)
-    // return
-  }
-
-  gGame.isFirstClick = false
-
-  if (gBoard[i][j].isMine) {
-    loseState(elCell, i, j)
-    return
-  }
-
-  gBoard[i][j].isShown = true
-  gGame.shownCount++
-
-  const elCellText = elCell.querySelector('.inner-cell')
-  elCellText.classList.remove('hidden')
-  elCellText.innerText = gBoard[i][j].minesAroundCount
-  elCell.classList.add('shown')
-  elCell.disabled = 'true'
-
-  checkGameOver()
 }
 
 /* Called when a cell is right clicked
@@ -326,27 +296,11 @@ function checkGameOver() {
   const BOARD_SIZE = gLevel.SIZE ** 2
   const BOARD_SHOWN_SIZE = BOARD_SIZE - gLevel.MINES
 
-  console.log(BOARD_SHOWN_SIZE, gGame.shownCount, gGame.markedCount)
   if (gGame.shownCount === BOARD_SHOWN_SIZE) {
     victoryState()
     stopTimer()
   }
 }
-
-/* When user clicks a cell with no 
-mines around, we need to open 
-not only that cell, but also its 
-neighbors. 
-NOTE: start with a basic 
-implementation that only opens 
-the non-mine 1st degree 
-neighbors
-BONUS: if you have the time 
-later, try to work more like the 
-real algorithm (see description 
-at the Bonuses section below)
- */
-function expandShown(board, elCell, i, j) {}
 
 function handleFirstClick(elCell, i, j) {
   gGame.isFirstClick = false
@@ -370,13 +324,13 @@ function onHintActivate() {
   }
 }
 
-function selectCellHint(elCell, idxI, idxJ) {
+function selectCellHint(idxI, idxJ) {
   gGame.hintCount--
   for (let i = idxI - 1; i <= idxI + 1; i++) {
-    if (i < 0 || i > gBoard.length) continue
+    if (i < 0 || i >= gBoard.length) continue
 
     for (let j = idxJ - 1; j <= idxJ + 1; j++) {
-      if (j < 0 || j > gBoard[i].length) continue
+      if (j < 0 || j >= gBoard[i].length) continue
       const elCurrInnerCell = document.querySelector(`.inner-cell-${i}-${j}`)
       const elCurrCellbtn = document.querySelector(`.cell-btn-${i}-${j}`)
       clearTimeout(highlightTimer1)
@@ -528,4 +482,77 @@ function startTimer() {
 function stopTimer() {
   clearInterval(gTimer)
   gTimer = 0
+}
+
+/* Called when a cell is clicked */
+function onCellClicked(elCell, i, j) {
+  if (gGame.isFirstClick) {
+    if (!gGame.isHint) startTimer()
+  }
+
+  if (gGame.isHint) {
+    selectCellHint(i, j)
+    return
+  }
+
+  if (gBoard[i][j].isMarked || !gGame.isOn || gBoard[i][j].isShown) return
+
+  if (gGame.isFirstClick && gBoard[i][j].isMine) {
+    handleFirstClick(elCell, i, j)
+    // return
+  }
+  gGame.isFirstClick = false
+  if (gBoard[i][j].minesAroundCount === ' ') expandShown(elCell, i, j)
+  if (gBoard[i][j].isMine) {
+    loseState(elCell, i, j)
+    return
+  }
+
+  if (!gBoard[i][j].isShown) gGame.shownCount++
+  gBoard[i][j].isShown = true
+
+  const elCellText = elCell.querySelector('.inner-cell')
+  elCellText.classList.remove('hidden')
+  elCellText.innerText = gBoard[i][j].minesAroundCount
+  elCell.classList.add('shown')
+  elCell.disabled = 'true'
+
+  checkGameOver()
+}
+
+/* When user clicks a cell with no 
+mines around, we need to open 
+not only that cell, but also its 
+neighbors. 
+NOTE: start with a basic 
+implementation that only opens 
+the non-mine 1st degree 
+neighbors
+BONUS: if you have the time 
+later, try to work more like the 
+real algorithm (see description 
+at the Bonuses section below)
+ */
+function expandShown(elCell, idxI, idxJ) {
+  if (gBoard[idxI][idxJ].minesAroundCount !== ' ' || gBoard[idxI][idxJ].isShown) return
+
+  if (!gBoard[idxI][idxJ].isShown) gGame.shownCount++
+  gBoard[idxI][idxJ].isShown = true
+
+  const elCellText = elCell.querySelector(`.inner-cell-${idxI}-${idxJ}`)
+  elCellText.classList.remove('hidden')
+  elCellText.innerText = gBoard[idxI][idxJ].minesAroundCount
+  elCell.classList.add('shown')
+  elCell.disabled = 'true'
+
+  if (gBoard[idxI][idxJ].minesAroundCount === ' ') {
+    for (var i = idxI - 1; i <= idxI + 1; i++) {
+      if (i < 0 || i > gBoard.length - 1) continue
+      for (var j = idxJ - 1; j <= idxJ + 1; j++) {
+        if (j < 0 || j > gBoard[i].length - 1) continue
+        const targetCell = document.querySelector(`.cell-btn-${i}-${j}`)
+        onCellClicked(targetCell, i, j)
+      }
+    }
+  }
 }
