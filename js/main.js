@@ -75,6 +75,7 @@ function onInit(difficulty) {
   renderResetButtonEmoji('reset')
   renderBoard(gBoard)
   renderLeaderboard()
+  leaderboardRenderOperations('hide')
 }
 
 /* Builds the board 
@@ -139,7 +140,9 @@ function generateTdHTMLString(board, i, j) {
         inner-cell 
         inner-cell-${i}-${j} 
         ${board[i][j].isShown ? '' : 'hidden'}">
-          ${board[i][j].isMine ? `${BOMB}` : `${board[i][j].minesAroundCount}`}
+          <p>${
+            board[i][j].isMine ? `${BOMB}` : `${board[i][j].minesAroundCount}`
+          }</p>
       </div></button></td>\n`
   return HTMLstr
 }
@@ -187,8 +190,8 @@ function difficultySetup(difficulty) {
       break
     case 'hard':
       gLevel = {
-        SIZE: 16,
-        MINES: 40,
+        SIZE: 14,
+        MINES: 32,
         LIVES: 3,
         HINTS: 3,
         DIFFICULTY: 'HARD',
@@ -342,6 +345,7 @@ function onCellMarked(elCellBtn, i, j) {
   if (gBoard[i][j].isShown || !gGame.isOn) return
 
   const elInnerCell = elCellBtn.querySelector('.inner-cell')
+  const elInnerText = elCellBtn.querySelector('.inner-cell p')
   const currentCell = gBoard[i][j]
 
   if (currentCell.isMarked) {
@@ -352,7 +356,7 @@ function onCellMarked(elCellBtn, i, j) {
 
     elCellBtn.classList.remove('marked')
     elInnerCell.classList.add('hidden')
-    elInnerCell.innerText = currentCell.isMine
+    elInnerText.innerText = currentCell.isMine
       ? `${BOMB}`
       : `${currentCell.minesAroundCount}`
 
@@ -366,7 +370,7 @@ function onCellMarked(elCellBtn, i, j) {
 
   elCellBtn.classList.add('marked')
   elInnerCell.classList.remove('hidden')
-  elInnerCell.innerText = `${FLAG}`
+  elInnerText.innerText = `${FLAG}`
 
   checkGameOver()
   return
@@ -408,6 +412,7 @@ function renderTimer() {
 }
 function renderLives() {
   var livesStr = ''
+  if(gGame.livesCount === 0 ) livesStr += '❌'
   for (let i = 0; i < gGame.livesCount; i++) {
     livesStr += '❤'
   }
@@ -423,7 +428,8 @@ function renderHints() {
 
   const elHintsbtn = document.querySelector('.hint-btn')
   elHintsbtn.classList.remove('selected')
-  elHintsbtn.innerText = hintsStr
+  const elHintsbtnStr = document.querySelector('.hint-btn span')
+  elHintsbtnStr.innerText = hintsStr
 }
 /* Render the board as a <table> 
 to the page */
@@ -439,6 +445,21 @@ function renderBoard(board) {
   }
   const elTable = document.querySelector('.gameboard')
   elTable.innerHTML = HTMLstr
+}
+
+function leaderboardRenderOperations(operation) {
+  const elLeaderboard = document.querySelector('.leaderboard')
+  switch (operation) {
+    case 'hide':
+      elLeaderboard.classList.add('hidden')
+      break
+    case 'show':
+      elLeaderboard.classList.remove('hidden')
+      break
+    case 'toggle':
+      elLeaderboard.classList.toggle('hidden')
+      break
+  }
 }
 
 function renderLeaderboard() {

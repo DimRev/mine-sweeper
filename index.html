@@ -10,17 +10,19 @@
   <body onload="onInit('easy')">
     <header>
       <h1>Mine Sweeper</h1>
+      
     </header>
-    <div class="Difficulty-Container">
+    <div class="difficulty-container">
       <button onclick="onInit('easy')">Easy</button>
       <button onclick="onInit('normal')">Normal</button>
       <button onclick="onInit('hard')">Hard</button>
+      <button class="rst-btn" onclick="onInit()">😁</button>
     </div>
     <div class="counters-container">
       <div class="mines-left">Mines<span>2</span></div>
       <div class="lives-left">Lives<span>❤❤❤</span></div>
-      <button class="rst-btn" onclick="onInit()">😁</button>
-      <button class="hint-btn" onclick="onHintActivate()">💡💡💡</button>
+      
+      <button class="hint-btn" onclick="onHintActivate()">hints<span>💡💡💡</span></button>
       <div class="timer">Time<span>00:00</span></div>
     </div>
 
@@ -34,9 +36,12 @@
 
     <footer>
       <p>Made by - Dima Revelson</p>
-      <button class="rst-leaderboard-btn" onclick="resetLeaderboard()">
-        reset leaderboard
-      </button>
+      <div class="footer-btns">
+        <button class="rst-leaderboard-btn" onclick="resetLeaderboard()">
+          reset leaderboard
+        </button>
+        <button class="tgl-leaderboard-btn" onclick="leaderboardRenderOperations('toggle')">toggle leaderboard</button>
+      </div>
     </footer>
   </body>
 </html>
