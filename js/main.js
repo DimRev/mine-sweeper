@@ -78,6 +78,11 @@ function onInit(difficulty) {
   leaderboardRenderOperations('hide')
 }
 
+function startup(){
+  const elStartUpContainer = document.querySelector('.startup-container')
+  elStartUpContainer.classList.add('hidden')
+}
+
 /* Builds the board 
 Set the mines
 Call setMinesNegsCount()
@@ -631,6 +636,7 @@ function victoryState() {
     time: elTimer.innerText,
   }
   updateLeaderboard(player)
+  leaderboardRenderOperations('show')
 }
 
 /* Game ends when all mines are 
