@@ -659,14 +659,14 @@ function checkGameOver() {
 
 //* SOUNDS
 function bombSound(){
-  var bombAudio = new Audio('../audio/bomb.wav')
+  var bombAudio = new Audio('audio/bomb.wav')
   bombAudio.play()
 }
 function clickSound(){
-  var bombAudio = new Audio('../audio/click.wav')
+  var bombAudio = new Audio('audio/click.wav')
   bombAudio.play()
 }
 function revealSound(){
-  var bombAudio = new Audio('../audio/reveal.wav')
+  var bombAudio = new Audio('audio/reveal.wav')
   bombAudio.play()
 }
