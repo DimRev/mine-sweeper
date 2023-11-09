@@ -47,6 +47,7 @@ const FLAG = '🚩'
 
 /* This is called when page loads  */
 function onInit(difficulty) {
+  clickSound()
   gBoard = []
 
   gLeaderboard = []
@@ -213,10 +214,10 @@ function onCellClicked(elCell, i, j) {
     if (!gGame.isHint) startTimer()
   }
 
-  if (gGame.isHint) {
-    selectCellHint(i, j)
-    return
-  }
+if (gGame.isHint) {
+  selectCellHint(i, j)
+  return
+}
 
   if (gBoard[i][j].isMarked || !gGame.isOn || gBoard[i][j].isShown) return
 
@@ -224,9 +225,11 @@ function onCellClicked(elCell, i, j) {
     handleFirstClick(elCell, i, j)
     // return
   }
+  
   gGame.isFirstClick = false
   if (gBoard[i][j].minesAroundCount === ' ') expandShown(elCell, i, j)
   if (gBoard[i][j].isMine) {
+    bombSound()
     loseState(elCell, i, j)
     return
   }
@@ -635,6 +638,7 @@ function victoryState() {
     name: prompt('Type your name:'),
     time: elTimer.innerText,
   }
+  revealSound()
   updateLeaderboard(player)
   leaderboardRenderOperations('show')
 }
@@ -650,4 +654,19 @@ function checkGameOver() {
     victoryState()
     stopTimer()
   }
+}
+
+
+//* SOUNDS
+function bombSound(){
+  var bombAudio = new Audio('../audio/bomb.wav')
+  bombAudio.play()
+}
+function clickSound(){
+  var bombAudio = new Audio('../audio/click.wav')
+  bombAudio.play()
+}
+function revealSound(){
+  var bombAudio = new Audio('../audio/reveal.wav')
+  bombAudio.play()
 }
