@@ -39,7 +39,7 @@ var gLevel
 var gGame
 var gLeaderboard
 var gTimer
-
+var gDay = false
 const BOMB = '💣'
 const FLAG = '🚩'
 

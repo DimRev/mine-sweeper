@@ -14,11 +14,13 @@
       <button onclick="onInit('hard')">Hard</button>
       <button class="rst-btn" onclick="onInit()">😁</button>
     </div>
-    <div class="counters-container">
+    <div class="counters-container gradient">
       <div class="mines-left">Mines<span>2</span></div>
       <div class="lives-left">Lives<span>❤❤❤</span></div>
-      
-      <button class="hint-btn" onclick="onHintActivate()">hints<span>💡💡💡</span></button>
+
+      <button class="hint-btn" onclick="onHintActivate()">
+        hints<span>💡💡💡</span>
+      </button>
       <div class="timer">Time<span>00:00</span></div>
     </div>
 
@@ -28,6 +30,7 @@
     </div>
 
     <script src="js/utils.js"></script>
+    <script src="js/colors.js"></script>
     <script src="js/main.js"></script>
 
     <footer>
@@ -36,7 +39,10 @@
         <button class="rst-leaderboard-btn" onclick="resetLeaderboard()">
           reset leaderboard
         </button>
-        <button class="tgl-leaderboard-btn" onclick="leaderboardRenderOperations('toggle')">toggle leaderboard</button>
+        <button class="tgl-leaderboard-btn" onclick="leaderboardRenderOperations('toggle')">
+          toggle leaderboard
+        </button>
+        <button class="day-night-btn" onclick="dayNightMode()">Day/Night</button>
       </div>
     </footer>
   </body>

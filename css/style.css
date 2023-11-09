@@ -1,4 +1,27 @@
+:root {
+  --body-bgc: #186d6a;
+  --button-bgc: #0f0f0f;
+  --buttons-bos: #00000050;
+  --buttons-hover-bgc: #535353;
+  --counter-container-border: #0f0f0f;
+  --hearts-color: #ca2e2e;
+  --leaderboard-bgc: #443333a5;
+  --leaderboard-col:#7ba1c5;
+  --leaderboard-bos-inner: #00000080;
+  --leaderboard-bos-outer: #ffffff80;
+  --shown-bgc:#757a75;
+  --marked-bgc:#617e9b;
+  --losing-bgc:#c43131;
+  --losing-bos:#4e0a0a80;
+  --missed-bgc:#3cf5ec;
+  --win-marked-bgc:#229122;
+  --selected-bgc:#ffa500;
+  --selected-bos:#ffa50080;
+
+}
+
 body {
+  background-color: var(--body-bgc);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -22,26 +45,26 @@ td {
 }
 
 button {
-  background-color: rgb(24, 109, 106);
+  background-color: var(--button-bgc);
   align-self: center;
-  height: .5rem;
-  width: .5rem;
-  color: black;
+  height: 0.5rem;
+  width: 0.5rem;
+  color: aliceblue;
   text-transform: uppercase;
   font-weight: 500;
   font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-  box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.3);
+  box-shadow: 2px 2px 2px var(--buttons-bos);
 }
 
 button:hover {
-  background-color: #9a9a9a;
+  background-color: var(--buttons-hover-bgc);
 }
 
 .counters-container {
   position: fixed;
   top: 0;
 
-  border: 1px solid #eee;
+  border: 1px solid var(--counter-container-border);
   border-radius: 30px;
   width: 100%;
 
@@ -72,7 +95,7 @@ button:hover {
   height: 100%;
 }
 .counters-container .lives-left span {
-  color: red;
+  color: var(--hearts-color);
   animation: buttonShift 1s linear infinite;
 }
 
@@ -112,10 +135,10 @@ button:hover {
   bottom: 10vh;
   transform: translate(-50%, -50%);
   width: 40vw;
-  background-color: #6b6b6ba5;
+  background-color: var(--leaderboard-bgc);
   border-radius: 30px;
-  box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.5),
-    0 0 100px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 10px 0px var(--leaderboard-bos-inner),
+              0 0 100px 0 var(--leaderboard-bos-outer);
   animation: hiddenTrans 5s linear;
 }
 
@@ -147,7 +170,8 @@ footer {
   gap: 2vh;
 }
 .rst-leaderboard-btn,
-.tgl-leaderboard-btn {
+.tgl-leaderboard-btn,
+.day-night-btn {
   width: 9rem;
   height: 3rem;
 }
@@ -160,7 +184,7 @@ footer {
     right: 0;
     display: flex;
     flex-direction: column;
-    gap: 1vh; 
+    gap: 1vh;
   }
   .leaderboard td {
     font-size: 1.2vw;
@@ -201,41 +225,42 @@ footer {
 
 .shown,
 .shown:disabled {
-  background-color: rgb(147, 152, 146);
+  background-color: var(--shown-bgc);
 }
 
 .marked,
 .marked:disabled {
-  background-color: rgb(50, 69, 88);
+  background-color: var(--marked-bgc);
 }
 
 .losing-bomb,
 .losing-bomb:disabled {
-  background-color: rgb(94, 35, 35);
-  box-shadow: 0 0 15px 6px rgba(255, 1, 1, 0.5);
+  background-color: var(--losing-bgc);
+  box-shadow: 0 0 15px 6px var(--losing-bgc);
 }
 
 .missed,
 .missed:disabled {
-  background-color: lightseagreen;
+  background-color: var(--missed-bgc);
 }
 
 .win-marked,
 .win-marked:disabled {
-  background-color: green;
+  background-color: var(--win-marked-bgc);
 }
 
 .selected {
-  background-color: orange;
-  box-shadow: 0 0 3px 5px rgba(255, 165, 0, 0.5);
+  background-color: var(--selected-bgc);
+  box-shadow: 0 0 3px 5px var(--selected-bos);
   border-radius: 5px;
 }
 
 .leaderboard {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-weight: 700;
-  text-shadow: 2px 1px 1px rgba(0, 0, 0, 0.5), 3px 2px 1px rgba(0, 0, 0, 0.5);
-  color: rgb(135, 160, 183);
+  text-shadow: 2px 1px 1px rgba(0, 0, 0, 0.5), 
+               3px 2px 1px rgba(0, 0, 0, 0.5);
+  color: var(--leaderboard-col);
 }
 
 @keyframes buttonWiggle {
@@ -281,5 +306,24 @@ footer {
   }
   100% {
     transform: translateX(0px);
+  }
+}
+@keyframes borderspin {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  50.1% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
   }
 }
