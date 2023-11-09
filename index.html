@@ -7,11 +7,15 @@
     <link rel="stylesheet" href="css/style.css" />
     <title>Mine Sweeper</title>
   </head>
-  <body onload="onInit()">
+  <body onload="onInit('easy')">
     <header>
       <h1>Mine Sweeper</h1>
     </header>
-
+    <div class="Difficulty-Container">
+      <button onclick="onInit('easy')">Easy</button>
+      <button onclick="onInit('normal')">Normal</button>
+      <button onclick="onInit('hard')">Hard</button>
+    </div>
     <div class="counters-container">
       <div class="mines-left">Mines<span>2</span></div>
       <div class="lives-left">Lives<span>❤❤❤</span></div>
