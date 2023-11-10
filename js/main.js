@@ -87,7 +87,6 @@ function onInit(difficulty) {
   clearInterval(gTimer)
   gTimer = 0
 
-
   renderMagaSafeBtns()
   renderTimer()
   renderLives()
@@ -246,8 +245,8 @@ function onCellClicked(elCellBtn, i, j) {
     if (!gGame.isHint) startTimer()
   }
 
-  if(gGame.isMagaHint){
-    selectCellMegaHint(i,j)
+  if (gGame.isMagaHint) {
+    selectCellMegaHint(i, j)
     return
   }
 
@@ -431,7 +430,6 @@ function onHintActivate() {
   }
 }
 
-
 function onSafeClick() {
   if (gGame.safeCount <= 0) return
   gGame.safeCount--
@@ -469,13 +467,17 @@ function onMagaHintActivate() {
 
 function selectCellMegaHint(idxI, idxJ) {
   if (gMagaHint.idx === 0) {
-    const elSelectedCellBtn = document.querySelector(`.cell-btn-${idxI}-${idxJ}`)
+    const elSelectedCellBtn = document.querySelector(
+      `.cell-btn-${idxI}-${idxJ}`
+    )
     elSelectedCellBtn.classList.add('selected')
     gMagaHint.from.i = idxI
     gMagaHint.from.j = idxJ
     gMagaHint.idx++
-  } else if (gMagaHint.idx === 1){
-    const elSelectedCellBtn = document.querySelector(`.cell-btn-${idxI}-${idxJ}`)
+  } else if (gMagaHint.idx === 1) {
+    const elSelectedCellBtn = document.querySelector(
+      `.cell-btn-${idxI}-${idxJ}`
+    )
     elSelectedCellBtn.classList.add('selected')
     gMagaHint.to.i = idxI
     gMagaHint.to.j = idxJ
@@ -544,7 +546,7 @@ function renderLives() {
   elLivesCounter.innerText = livesStr
 }
 
-function renderMagaSafeBtns(){
+function renderMagaSafeBtns() {
   const elMagaHintBtn = document.querySelector('.maga-hint-btn')
   const elSafeBtn = document.querySelector('.safe-btn')
   elMagaHintBtn.classList.add('selected')
@@ -784,6 +786,7 @@ function loseState(elCellBtn, i, j) {
 }
 
 function victoryState() {
+  if (!gGame.isOn) return
   gGame.isOn = false
   const elTimer = document.querySelector('.timer span')
 
