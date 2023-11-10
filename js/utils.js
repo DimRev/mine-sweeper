@@ -19,7 +19,7 @@ function getRandomIntegerInc(min, max) {
 }
 
 //Returns empty matrix Mrxc
-function createMat(rows, cols) {
+function createMat(rows, cols = rows) {
   const mat = []
   for (var i = 0; i < rows; i++) {
     const row = []

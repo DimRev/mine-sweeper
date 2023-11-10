@@ -167,13 +167,15 @@ footer {
   align-items: center;
   flex-direction: column;
   text-align: center;
-  gap: 2vh;
 }
 .rst-leaderboard-btn,
 .tgl-leaderboard-btn,
-.day-night-btn {
-  width: 9rem;
-  height: 3rem;
+.day-night-btn,
+.safe-btn,
+.maga-hint-btn {
+  vertical-align: middle;
+  width: 6rem;
+  height: 4rem;
 }
 
 @media (min-width: 780px) {
