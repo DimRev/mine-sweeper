@@ -87,6 +87,8 @@ function onInit(difficulty) {
   clearInterval(gTimer)
   gTimer = 0
 
+
+  renderMagaSafeBtns()
   renderTimer()
   renderLives()
   renderHints()
@@ -540,6 +542,13 @@ function renderLives() {
   }
   const elLivesCounter = document.querySelector('.lives-left span')
   elLivesCounter.innerText = livesStr
+}
+
+function renderMagaSafeBtns(){
+  const elMagaHintBtn = document.querySelector('.maga-hint-btn')
+  const elSafeBtn = document.querySelector('.safe-btn')
+  elMagaHintBtn.classList.add('selected')
+  elSafeBtn.classList.add('selected')
 }
 
 function renderHints() {
