@@ -49,6 +49,7 @@ var gLeaderboard
 var gMagaHint
 var gTimer
 var gDay = false
+var gFromExpendShown = false
 const BOMB = '💣'
 const FLAG = '🚩'
 
@@ -176,7 +177,7 @@ function generateTdHTMLString(board, i, j) {
 
   if (!currCell.isMarked && !currCell.isShown) {
     cellBtnClass = ''
-    innerCellClass = ''
+    innerCellClass = 'hidden'
     innerCellInnerText = ` `
   } else if (currCell.isMarked) {
     cellBtnClass = 'marked'
@@ -295,10 +296,12 @@ function onCellClicked(elCellBtn, i, j) {
     // return
   }
 
-  gGame.isFirstClick = false
-
   if (gBoard[i][j].minesAroundCount === ' ') expandShown(elCellBtn, i, j)
 
+  if (!gFromExpendShown) {
+    gGame.turn++
+    boardStrStore()
+  }
   if (gBoard[i][j].isMine) {
     bombSound()
     loseState(elCellBtn, i, j)
@@ -315,8 +318,7 @@ function onCellClicked(elCellBtn, i, j) {
   elCellBtn.disabled = 'true'
 
   checkGameOver()
-  gGame.turn++
-  boardStrStore()
+  gFromExpendShown = false
 }
 
 /* When user clicks a cell with no 
@@ -333,6 +335,7 @@ real algorithm (see description
 at the Bonuses section below)
  */
 function expandShown(elCellBtn, idxI, idxJ) {
+  gFromExpendShown = true
   gGame.isFirstClick = false
   if (
     gBoard[idxI][idxJ].minesAroundCount !== ' ' ||
@@ -406,6 +409,8 @@ function onCellMarked(elCellBtn, i, j) {
     currentCell.isMarked = false
 
     gGame.markedCount--
+    gGame.turn++
+    boardStrStore()
     renderMines()
 
     elCellBtn.classList.remove('marked')
@@ -427,6 +432,8 @@ function onCellMarked(elCellBtn, i, j) {
   elInnerText.innerText = `${FLAG}`
 
   checkGameOver()
+  gGame.turn++
+  boardStrStore()
   return
 }
 
@@ -634,8 +641,7 @@ function leaderboardRenderOperations(operation) {
 function renderLeaderboard() {
   gLeaderboard = []
   for (let i = 1; i <= 10; i++) {
-    var playerStr = leaderboardRetrieve(i)
-    var playerObj = leaderboardStrObjectFactory(playerStr)
+    var playerObj = leaderboardRetrieve(i)
     gLeaderboard.push(playerObj)
   }
   var leaderboardHTMLStr = '<table class="leaderboard">'
@@ -673,25 +679,17 @@ function updateLeaderboard(player) {
   renderLeaderboard()
 }
 
-function leaderboardStrObjectFactory(playerStr) {
-  const playerArr = playerStr.split('-')
-  const player = {
-    name: playerArr[0],
-    time: playerArr[1],
-  }
-  return player
-}
-
 function leaderboardStore(playerObj, position) {
   if (playerObj === null) return
   position = `${gLevel.DIFFICULTY}` + position
-  const playerStr = Object.values(playerObj).join('-')
+  const playerStr = JSON.stringify(playerObj)
   localStorage.setItem(position, playerStr)
 }
 
 function leaderboardRetrieve(position) {
   position = `${gLevel.DIFFICULTY}` + position
-  return localStorage.getItem(position)
+  const playerObj = localStorage.getItem(position)
+  return JSON.parse(playerObj)
 }
 
 function resetLeaderboard() {
@@ -726,45 +724,39 @@ function resetLeaderboard() {
 
 //* UNDO
 
-function boardStateString() {
-  var boardStr = ''
-  for (let i = 0; i < gBoard.length; i++) {
-    for (let j = 0; j < gBoard[i].length; j++) {
-      const currCell = gBoard[i][j]
-      boardStr += `${i}_${j}_${Object.values(currCell).join('_')}_`
-    }
-  }
-  return boardStr
-}
-
-function boardStrObjectArrFactory(boardStr) {
-  var boardArr = boardStr.split('_')
-  var boardObjArr = createMat(gLevel.SIZE)
-  for (let i = 0; i < boardArr.length - 6; i += 6) {
-    boardObjArr[boardArr[i]][boardArr[i + 1]] = {
-      minesAroundCount: +boardArr[i + 2] === 0 ? ' ' : +boardArr[i + 2],
-      isShown: JSON.parse(boardArr[i + 3]),
-      isMine: JSON.parse(boardArr[i + 4]),
-      isMarked: JSON.parse(boardArr[i + 5]),
-    }
-  }
-
-  return boardObjArr
-}
-
 function boardStrStore() {
   const turnAddress = 'turn' + gGame.turn
-  const boardStr = boardStateString()
-  localStorage.setItem(turnAddress, boardStr)
+  const currBoardStr = JSON.stringify(gBoard)
+  localStorage.setItem(turnAddress, currBoardStr)
 }
 
 function onUndoClick() {
   if (gGame.turn === 0) return
+
+  // Decrement the turn and get the previous board state
   gGame.turn--
   const turnAddress = 'turn' + gGame.turn
   const boardStr = localStorage.getItem(turnAddress)
-  gBoard = boardStrObjectArrFactory(boardStr)
+  gBoard = JSON.parse(boardStr)
   renderBoard(gBoard)
+
+  // Update shownCount based on the current state of the board
+  gGame.shownCount = 0
+  for (let i = 0; i < gBoard.length; i++) {
+    for (let j = 0; j < gBoard[i].length; j++) {
+      if (gBoard[i][j].isShown) {
+        gGame.shownCount++
+      }
+    }
+  }
+
+  // If the undo undoes a whole bunch of cells, update the shownCount accordingly
+  if (gGame.shownCount < gGame.prevShownCount) {
+    gGame.shownCount = gGame.prevShownCount
+  }
+
+  // Update the previous shownCount for the next undo
+  gGame.prevShownCount = gGame.shownCount
 }
 
 //* TIMER
@@ -797,7 +789,9 @@ function stopTimer() {
 }
 
 //* ENDGAME STATES
-//TODO rework losing state
+
+//TODO REWORK WHOLE LOSE/WIN STATE LOGIC
+
 function loseState(elCellBtn, i, j) {
   gGame.livesCount--
   renderLives()
@@ -811,15 +805,29 @@ function loseState(elCellBtn, i, j) {
   gGame.isOn = false
 
   elCellBtn.classList.add('losing-bomb')
-  const elHiddenInnerCells = document.querySelectorAll('.hidden')
-  elHiddenInnerCells.forEach((elHiddenCell) => {
-    elHiddenCell.classList.remove('hidden')
+
+  for (let i = 0; i < gBoard.length; i++) {
+    for (let j = 0; j < gBoard[i].length; j++) {
+      const currCell = gBoard[i][j]
+      const elCurrInnerCell = document.querySelector(`.inner-cell-${i}-${j}`)
+      const elCurrCellbtn = document.querySelector(`.cell-btn-${i}-${j}`)
+      if (currCell.isMine) {
+        elCurrInnerCell.innerText = `${BOMB}`
+      }
+    }
+  }
+
+  const elHiddenInnerCells = document.querySelectorAll('.inner-cell.hidden')
+  elHiddenInnerCells.forEach((elHiddenInnerCell) => {
+    elHiddenInnerCell.remove('hidden')
   })
+
   const elCellBtns = document.querySelectorAll('.cell-btn')
   elCellBtns.forEach((elCellBtn) => {
     elCellBtn.disabled = 'true'
   })
   renderResetButtonEmoji('lose')
+  leaderboardRenderOperations('show')
 }
 
 function victoryState() {
@@ -853,6 +861,7 @@ are shown */
 function checkGameOver() {
   const BOARD_SIZE = gLevel.SIZE ** 2
   const BOARD_SHOWN_SIZE = BOARD_SIZE - gLevel.MINES
+
   gBoard.shownCount = 0
   for (let i = 0; i < gBoard.length; i++) {
     for (let j = 0; j < gBoard[i].length; j++) {
