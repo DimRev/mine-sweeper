@@ -1,0 +1,330 @@
+:root {
+  --body-bgc: #186d6a;
+  --button-bgc: #0f0f0f;
+  --buttons-bos: #00000050;
+  --buttons-hover-bgc: #535353;
+  --counter-container-border: #0f0f0f;
+  --hearts-color: #ca2e2e;
+  --leaderboard-bgc: #443333a5;
+  --leaderboard-col:#7ba1c5;
+  --leaderboard-bos-inner: #00000080;
+  --leaderboard-bos-outer: #ffffff80;
+  --shown-bgc:#757a75;
+  --marked-bgc:#617e9b;
+  --losing-bgc:#c43131;
+  --losing-bos:#4e0a0a80;
+  --missed-bgc:#3cf5ec;
+  --win-marked-bgc:#229122;
+  --selected-bgc:#ffa500;
+  --selected-bos:#ffa50080;
+
+}
+
+body {
+  background-color: var(--body-bgc);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-collapse: collapse;
+}
+
+table,
+tr,
+td {
+  border-collapse: separate;
+  border-spacing: 0.2rem;
+  border-radius: 3px;
+}
+
+td {
+  height: 2rem;
+  width: 2rem;
+  aspect-ratio: 1;
+  text-align: center;
+}
+
+button {
+  background-color: var(--button-bgc);
+  align-self: center;
+  height: 0.5rem;
+  width: 0.5rem;
+  color: aliceblue;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  box-shadow: 2px 2px 2px var(--buttons-bos);
+}
+
+button:hover {
+  background-color: var(--buttons-hover-bgc);
+}
+
+.counters-container {
+  position: fixed;
+  top: 0;
+
+  border: 1px solid var(--counter-container-border);
+  border-radius: 30px;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+
+  font-size: 1.5rem;
+  width: 90vw;
+  height: 10dvh;
+}
+
+.counters-container div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  gap: 0.5rem;
+  text-align: center;
+  width: 100%;
+
+  text-transform: uppercase;
+}
+
+.counters-container .hint-btn {
+  width: 100%;
+  height: 100%;
+}
+.counters-container .lives-left span {
+  color: var(--hearts-color);
+  animation: buttonShift 1s linear infinite;
+}
+
+.counters-container .hint-btn span {
+  animation: buttonShift 1s linear 0.1s infinite;
+}
+.counters-container .hint-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  gap: 0.5rem;
+}
+
+.difficulty-container button {
+  width: 5rem;
+  height: 5rem;
+}
+
+.difficulty-container button.rst-btn {
+  font-size: 2.5rem;
+  animation: buttonWiggle 1s linear infinite;
+}
+
+.mid-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(-4%);
+}
+
+.leaderboard table {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  bottom: 10vh;
+  transform: translate(-50%, -50%);
+  width: 40vw;
+  background-color: var(--leaderboard-bgc);
+  border-radius: 30px;
+  box-shadow: 0 0 10px 0px var(--leaderboard-bos-inner),
+              0 0 100px 0 var(--leaderboard-bos-outer);
+  animation: hiddenTrans 5s linear;
+}
+
+.gameboard {
+  aspect-ratio: 1;
+}
+
+.gameboard button {
+  width: 90%;
+  height: 90%;
+}
+
+.gameboard div {
+  font-family: monospace;
+  width: 90%;
+  height: 90%;
+  font-size: 1.2rem;
+}
+
+footer {
+  position: fixed;
+  bottom: 1vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+.rst-leaderboard-btn,
+.tgl-leaderboard-btn,
+.day-night-btn,
+.safe-btn {
+  vertical-align: middle;
+  width: 6rem;
+  height: 4rem;
+}
+
+@media (min-width: 780px) {
+  .difficulty-container {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+  }
+  .leaderboard td {
+    font-size: 1.2vw;
+    height: 2.5vw;
+  }
+}
+@media (max-width: 779px) {
+  header {
+    display: none;
+  }
+  .difficulty-container {
+    position: fixed;
+    bottom: 13vh;
+    right: 50%;
+    display: flex;
+    flex-direction: row;
+    transform: translateX(50%);
+    gap: 1vh;
+  }
+  .difficulty-container button {
+    width: 5rem;
+    height: 2rem;
+  }
+  .difficulty-container button.rst-btn {
+    font-size: 1.7rem;
+  }
+  .leaderboard td {
+    font-size: 2.5vw;
+    height: 6vw;
+  }
+}
+
+/* Utility Classes - Coloring */
+
+.hidden {
+  display: none;
+}
+
+.shown,
+.shown:disabled {
+  background-color: var(--shown-bgc);
+}
+
+.marked,
+.marked:disabled {
+  background-color: var(--marked-bgc);
+}
+
+.losing-bomb,
+.losing-bomb:disabled {
+  background-color: var(--losing-bgc);
+  box-shadow: 0 0 15px 6px var(--losing-bgc);
+}
+
+.missed,
+.missed:disabled {
+  background-color: var(--missed-bgc);
+}
+
+.win-marked,
+.win-marked:disabled {
+  background-color: var(--win-marked-bgc);
+}
+
+.selected {
+  background-color: var(--selected-bgc);
+  box-shadow: 0 0 3px 5px var(--selected-bos);
+  border-radius: 5px;
+}
+
+.leaderboard {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-weight: 700;
+  text-shadow: 2px 1px 1px rgba(0, 0, 0, 0.5), 
+               3px 2px 1px rgba(0, 0, 0, 0.5);
+  color: var(--leaderboard-col);
+}
+
+@keyframes buttonWiggle {
+  0% {
+    /* transform: translateX(0px); */
+    transform: rotate(0deg);
+    /* transform: scale(1); */
+  }
+  25% {
+    /* transform: translateX(5px); */
+    transform: rotate(3deg);
+    /* transform: scale(1.2); */
+  }
+  50% {
+    /* transform: translateX(0px); */
+    transform: rotate(0deg);
+  }
+  75% {
+    /* transform: translateX(-5px); */
+    transform: rotate(-3deg);
+    /* transform: scale(1.2); */
+  }
+  100% {
+    /* transform: translateX(0px); */
+    transform: rotate(0deg);
+    /* transform: scale(1); */
+  }
+}
+@keyframes buttonShift {
+  0% {
+    transform: translateX(0px);
+    /* transform: scale(1); */
+  }
+  25% {
+    transform: translateX(5px);
+    /* transform: scale(1.2); */
+  }
+  50% {
+    transform: translateX(0px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+@keyframes borderspin {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  50.1% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
