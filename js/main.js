@@ -2,21 +2,21 @@
 
 //* gBoard – A Matrix containing cell objects
 
-/*
-//* cell: {
+/* //* cell: {
  minesAroundCount: 4,
  isShown: false,
  isMine: false,
  isMarked: true */
 
-/*
-//* gLevel = {
+/* //* gLevel = {
  SIZE: 4,
  MINES: 2
+ HINTS: 3
+ LIVES: 3
+ DIFFICULTY : 'EASY"
 } */
 
-/*
-//* gGame = {
+/* //* gGame = {
  isOn: true,
  isFirstClick : true,
  isHint : false,
@@ -24,8 +24,9 @@
  shownCount: 0,
  markedCount: 0,
  hintCount: 3,
- secsPassed: 0
- lives: 3
+ livesCount: 3,
+ safeCount: 3,
+ turn: 0,
 } */
 
 /*//* gLeaderboard = [{
@@ -97,7 +98,7 @@ function onInit(difficulty) {
   renderBoard(gBoard)
   renderLeaderboard()
   leaderboardRenderOperations('hide')
-  boardStrStore()
+  boardTurnStore()
 }
 
 function startup() {
@@ -301,7 +302,7 @@ function onCellClicked(elCellBtn, i, j) {
 
   if (!gFromExpendShown) {
     gGame.turn++
-    boardStrStore()
+    boardTurnStore()
   }
   if (gBoard[i][j].isMine) {
     bombSound()
@@ -422,7 +423,7 @@ function onCellMarked(elCellBtn, i, j) {
       ? `${BOMB}`
       : `${currentCell.minesAroundCount}`
 
-    boardStrStore()
+    boardTurnStore()
     return
   }
 
@@ -435,7 +436,7 @@ function onCellMarked(elCellBtn, i, j) {
   elInnerCell.innerText = `${FLAG}`
 
   gGame.turn++
-  boardStrStore()
+  boardTurnStore()
   return
 }
 
@@ -536,33 +537,41 @@ function hintLogicForCurrCell(i, j) {
   clearTimeout(highlightTimer2)
   var highlightTimer1 = 0
   var highlightTimer2 = 0
+  elCurrCellbtn.disabled = true
   if (!currCell.isShown) {
     elCurrInnerCell.classList.remove('hidden')
     elCurrCellbtn.classList.add('selected')
     if (gBoard[i][j].isMine) elCurrInnerCell.innerText = `${BOMB}`
     else
-      elCurrInnerCell.innerText =
-        gBoard[i][j].minesAroundCount === 0
-          ? ' '
-          : `${gBoard[i][j].minesAroundCount}`
-    setTimeout(() => {
-      elCurrInnerCell.classList.add('hidden')
-      elCurrCellbtn.classList.remove('selected')
-      elCurrInnerCell.innerText = ''
-    }, 1500)
-  }
-  if (currCell.isMarked) {
-    console.log('test')
-    elCurrCellbtn.classList.remove('marked')
-    elCurrCellbtn.classList.add('selected')
+    elCurrInnerCell.innerText =
+  gBoard[i][j].minesAroundCount === 0
+  ? ' '
+  : `${gBoard[i][j].minesAroundCount}`
+  setTimeout(() => {
+    elCurrInnerCell.classList.add('hidden')
+    elCurrCellbtn.classList.remove('selected')
     elCurrInnerCell.innerText = ''
-
-    setTimeout(() => {
-      elCurrCellbtn.classList.add('marked')
-      elCurrCellbtn.classList.remove('selected')
-      elCurrInnerCell.classList.remove('hidden')
-      elCurrInnerCell.innerHTML = `<p>${FLAG}</p>`
-    }, 1500)
+    elCurrCellbtn.disabled = false
+  }, 1500)
+}
+if (currCell.isMarked) {
+  console.log('test')
+  elCurrCellbtn.classList.remove('marked')
+  elCurrCellbtn.classList.add('selected')
+  if (gBoard[i][j].isMine) elCurrInnerCell.innerText = `${BOMB}`
+    else
+    elCurrInnerCell.innerText =
+  gBoard[i][j].minesAroundCount === 0
+  ? ' '
+  : `${gBoard[i][j].minesAroundCount}`
+  
+  setTimeout(() => {
+    elCurrCellbtn.classList.add('marked')
+    elCurrCellbtn.classList.remove('selected')
+    elCurrInnerCell.classList.remove('hidden')
+    elCurrInnerCell.innerHTML = `${FLAG}`
+    elCurrCellbtn.disabled = false
+  }, 1500)
   }
 }
 
@@ -741,7 +750,7 @@ function resetLeaderboard() {
 
 //* UNDO
 
-function boardStrStore() {
+function boardTurnStore() {
   const turnAddress = 'turn' + gGame.turn
   const currBoardStr = JSON.stringify(gBoard)
   localStorage.setItem(turnAddress, currBoardStr)
