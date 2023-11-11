@@ -387,7 +387,7 @@ function handleFirstClick(elCellBtn, i, j) {
   generateMines(gBoard, 1)
   setMinesNegsCount(gBoard)
   renderBoard(gBoard)
-  
+
   const elCurrInnerCell = document.querySelector(`.inner-cell-${i}-${j}`)
   elCurrInnerCell.innerText =
     currCell.minesAroundCount === ' ' ? ' ' : `${currCell.minesAroundCount}`
@@ -406,7 +406,6 @@ function onCellMarked(elCellBtn, i, j) {
   if (gBoard[i][j].isShown || !gGame.isOn) return
 
   const elInnerCell = elCellBtn.querySelector('.inner-cell')
-  const elInnerText = elCellBtn.querySelector('.inner-cell p')
   const currentCell = gBoard[i][j]
 
   if (currentCell.isMarked) {
@@ -433,7 +432,7 @@ function onCellMarked(elCellBtn, i, j) {
 
   elCellBtn.classList.add('marked')
   elInnerCell.classList.remove('hidden')
-  elInnerText.innerText = `${FLAG}`
+  elInnerCell.innerText = `${FLAG}`
 
   gGame.turn++
   boardStrStore()
@@ -500,8 +499,23 @@ function selectCellMegaHint(idxI, idxJ) {
     gMagaHint.idx++
   }
   if (gMagaHint.idx === 2) {
-    for (let i = gMagaHint.from.i; i <= gMagaHint.to.i; i++) {
-      for (let j = gMagaHint.from.j; j <= gMagaHint.to.j; j++) {
+    if (gMagaHint.from.i < gMagaHint.to.i) {
+      var iMin = gMagaHint.from.i
+      var iMax = gMagaHint.to.i
+    } else {
+      var iMin = gMagaHint.to.i
+      var iMax = gMagaHint.from.i
+    }
+    if (gMagaHint.from.j < gMagaHint.to.j) {
+      var jMin = gMagaHint.from.j
+      var jMax = gMagaHint.to.j
+    } else {
+      var jMin = gMagaHint.to.j
+      var jMax = gMagaHint.from.j
+    }
+
+    for (let i = iMin; i <= iMax; i++) {
+      for (let j = jMin; j <= jMax; j++) {
         hintLogicForCurrCell(i, j)
       }
     }
