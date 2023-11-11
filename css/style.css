@@ -6,18 +6,17 @@
   --counter-container-border: #0f0f0f;
   --hearts-color: #ca2e2e;
   --leaderboard-bgc: #443333a5;
-  --leaderboard-col:#7ba1c5;
+  --leaderboard-col: #7ba1c5;
   --leaderboard-bos-inner: #00000080;
   --leaderboard-bos-outer: #ffffff80;
-  --shown-bgc:#757a75;
-  --marked-bgc:#617e9b;
-  --losing-bgc:#c43131;
-  --losing-bos:#4e0a0a80;
-  --missed-bgc:#4b0909;
-  --win-marked-bgc:#229122;
-  --selected-bgc:#ffa500;
-  --selected-bos:#ffa50080;
-
+  --shown-bgc: #757a75;
+  --marked-bgc: #617e9b;
+  --losing-bgc: #c43131;
+  --losing-bos: #4e0a0a80;
+  --missed-bgc: #4b0909;
+  --win-marked-bgc: #229122;
+  --selected-bgc: #ffa500;
+  --selected-bos: #ffa50080;
 }
 
 body {
@@ -138,7 +137,7 @@ button:hover {
   background-color: var(--leaderboard-bgc);
   border-radius: 30px;
   box-shadow: 0 0 10px 0px var(--leaderboard-bos-inner),
-              0 0 100px 0 var(--leaderboard-bos-outer);
+    0 0 100px 0 var(--leaderboard-bos-outer);
   animation: hiddenTrans 5s linear;
 }
 
@@ -199,7 +198,7 @@ footer {
   }
   .difficulty-container {
     position: fixed;
-    bottom: 13vh;
+    bottom: 8vh;
     right: 50%;
     display: flex;
     flex-direction: row;
@@ -207,8 +206,9 @@ footer {
     gap: 1vh;
   }
   .difficulty-container button {
-    width: 5rem;
+    width: 2.7rem;
     height: 2rem;
+    font-size: 0.6rem;
   }
   .difficulty-container button.rst-btn {
     font-size: 1.7rem;
@@ -216,6 +216,41 @@ footer {
   .leaderboard td {
     font-size: 2.5vw;
     height: 6vw;
+  }
+  .rst-leaderboard-btn,
+  .tgl-leaderboard-btn,
+  .day-night-btn,
+  .safe-btn,
+  .maga-hint-btn {
+    vertical-align: middle;
+    width: 3rem;
+    height: 2rem;
+    font-size: 0.5rem;
+  }
+  footer p {
+    display: none;
+  }
+
+  .gameboard td,
+  .gameboard tr {
+    width: .8rem;
+    height: .8rem;
+  }
+
+  .gameboard div {
+    font-size: .6rem;
+    font-family: monospace;
+  }
+  .gameboard .inner-cell {
+    font-size: .6rem;
+  }
+
+  .counters-container {
+    font-size: .8rem;
+  }
+  .counters-container .lives-left span,
+  .counters-container .hint-btn span {
+    font-size: 1.2rem;
   }
 }
 
@@ -261,8 +296,7 @@ footer {
 .leaderboard {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-weight: 700;
-  text-shadow: 2px 1px 1px rgba(0, 0, 0, 0.5), 
-               3px 2px 1px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 1px 1px rgba(0, 0, 0, 0.5), 3px 2px 1px rgba(0, 0, 0, 0.5);
   color: var(--leaderboard-col);
 }
 
