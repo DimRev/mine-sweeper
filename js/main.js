@@ -295,6 +295,7 @@ function onCellClicked(elCellBtn, i, j) {
     handleFirstClick(elCellBtn, i, j)
     // return
   }
+  gGame.isFirstClick = false
 
   if (gBoard[i][j].minesAroundCount === ' ') expandShown(elCellBtn, i, j)
 
@@ -308,7 +309,6 @@ function onCellClicked(elCellBtn, i, j) {
     return
   }
 
-  if (!gBoard[i][j].isShown) gGame.shownCount++
   gBoard[i][j].isShown = true
 
   const elInnerCell = elCellBtn.querySelector('.inner-cell')
@@ -344,7 +344,6 @@ function expandShown(elCellBtn, idxI, idxJ) {
   )
     return
 
-  if (!gBoard[idxI][idxJ].isShown) gGame.shownCount++
   gBoard[idxI][idxJ].isShown = true
 
   const elInnerCell = elCellBtn.querySelector(`.inner-cell-${idxI}-${idxJ}`)
@@ -385,14 +384,19 @@ function handleFirstClick(elCellBtn, i, j) {
   currCell.isMine = false
   currCell.isShown = true
 
-  elCellBtn.querySelector('.inner-cell').innerText =
-    currCell.minesAroundCount === 0 ? ' ' : `${currCell.minesAroundCount}`
-  elCellBtn.classList.remove('hidden')
-  elCellBtn.classList.add('shown')
-
   generateMines(gBoard, 1)
   setMinesNegsCount(gBoard)
   renderBoard(gBoard)
+  
+  const elCurrInnerCell = document.querySelector(`.inner-cell-${i}-${j}`)
+  elCurrInnerCell.innerText =
+    currCell.minesAroundCount === ' ' ? ' ' : `${currCell.minesAroundCount}`
+  elCurrInnerCell.classList.remove('hidden')
+  elCellBtn.classList.add('shown')
+  if (!(currCell.minesAroundCount > 0)) {
+    currCell.isShown = false
+    expandShown(elCellBtn, i, j)
+  }
 }
 
 /* Called when a cell is right clicked
@@ -410,7 +414,7 @@ function onCellMarked(elCellBtn, i, j) {
 
     gGame.markedCount--
     gGame.turn++
-    boardStrStore()
+
     renderMines()
 
     elCellBtn.classList.remove('marked')
@@ -419,7 +423,7 @@ function onCellMarked(elCellBtn, i, j) {
       ? `${BOMB}`
       : `${currentCell.minesAroundCount}`
 
-    checkGameOver()
+    boardStrStore()
     return
   }
 
@@ -431,7 +435,6 @@ function onCellMarked(elCellBtn, i, j) {
   elInnerCell.classList.remove('hidden')
   elInnerText.innerText = `${FLAG}`
 
-  checkGameOver()
   gGame.turn++
   boardStrStore()
   return
@@ -749,14 +752,6 @@ function onUndoClick() {
       }
     }
   }
-
-  // If the undo undoes a whole bunch of cells, update the shownCount accordingly
-  if (gGame.shownCount < gGame.prevShownCount) {
-    gGame.shownCount = gGame.prevShownCount
-  }
-
-  // Update the previous shownCount for the next undo
-  gGame.prevShownCount = gGame.shownCount
 }
 
 //* TIMER
@@ -790,8 +785,6 @@ function stopTimer() {
 
 //* ENDGAME STATES
 
-//TODO REWORK WHOLE LOSE/WIN STATE LOGIC
-
 function loseState(elCellBtn, i, j) {
   gGame.livesCount--
   renderLives()
@@ -811,21 +804,19 @@ function loseState(elCellBtn, i, j) {
       const currCell = gBoard[i][j]
       const elCurrInnerCell = document.querySelector(`.inner-cell-${i}-${j}`)
       const elCurrCellbtn = document.querySelector(`.cell-btn-${i}-${j}`)
+      elCurrCellbtn.disabled = true
       if (currCell.isMine) {
         elCurrInnerCell.innerText = `${BOMB}`
+        elCurrInnerCell.classList.remove('hidden')
+        elCurrCellbtn.classList.add('missed')
+      } else if (!currCell.isShown) {
+        elCurrInnerCell.innerText = `${currCell.minesAroundCount}`
+        elCurrInnerCell.classList.remove('hidden')
+        elCurrCellbtn.classList.add('missed')
       }
     }
   }
 
-  const elHiddenInnerCells = document.querySelectorAll('.inner-cell.hidden')
-  elHiddenInnerCells.forEach((elHiddenInnerCell) => {
-    elHiddenInnerCell.remove('hidden')
-  })
-
-  const elCellBtns = document.querySelectorAll('.cell-btn')
-  elCellBtns.forEach((elCellBtn) => {
-    elCellBtn.disabled = 'true'
-  })
   renderResetButtonEmoji('lose')
   leaderboardRenderOperations('show')
 }
@@ -835,15 +826,22 @@ function victoryState() {
   gGame.isOn = false
   const elTimer = document.querySelector('.timer span')
 
-  const elMarkedCells = document.querySelectorAll('.shown')
-  elMarkedCells.forEach((elMarkedCell) => {
-    elMarkedCell.classList.add('win-marked')
-    elMarkedCell.classList.remove('shown')
-  })
-  const elCellBtns = document.querySelectorAll('.cell-btn')
-  elCellBtns.forEach((elCellBtn) => {
-    elCellBtn.disabled = 'true'
-  })
+  for (let i = 0; i < gBoard.length; i++) {
+    for (let j = 0; j < gBoard[i].length; j++) {
+      const currCell = gBoard[i][j]
+      const elCurrInnerCell = document.querySelector(`.inner-cell-${i}-${j}`)
+      const elCurrCellbtn = document.querySelector(`.cell-btn-${i}-${j}`)
+      elCurrCellbtn.disabled = true
+      if (currCell.isMine) {
+        elCurrInnerCell.innerText = `${BOMB}`
+        elCurrInnerCell.classList.remove('hidden')
+      } else if (currCell.isShown) {
+        elCurrInnerCell.innerText = `${currCell.minesAroundCount}`
+        elCurrInnerCell.classList.remove('hidden')
+        elCurrCellbtn.classList.add('win-marked')
+      }
+    }
+  }
   renderResetButtonEmoji('win')
 
   const player = {
@@ -868,7 +866,7 @@ function checkGameOver() {
       if (gBoard[i][j].isShown) gBoard.shownCount++
     }
   }
-  if (gGame.shownCount === BOARD_SHOWN_SIZE) {
+  if (gBoard.shownCount === BOARD_SHOWN_SIZE) {
     victoryState()
     stopTimer()
   }
