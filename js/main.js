@@ -624,6 +624,7 @@ function renderMagaSafeBtns() {
 function renderHints() {
   gGame.isHint = false
   var hintsStr = ''
+  if (gGame.hintCount === 0) hintsStr += '❌'
   for (let i = 0; i < gGame.hintCount; i++) {
     hintsStr += '💡'
   }
